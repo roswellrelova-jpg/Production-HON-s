@@ -6,11 +6,11 @@
 <title>Handover Notes — Norwegian Aqua APMP</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy:#0A1628; --ocean:#0E3A6E; --teal:#0B7EA8;
-  --sky:#E8F4FA; --white:#FFFFFF; --slate:#4A5568;
-  --mist:#F0F6FB; --border:#C9DFF0;
-  --red:#C0392B; --green:#1E7A50; --amber:#B45309;
+:root{
+  --navy:#0A1628;--ocean:#0E3A6E;--teal:#0B7EA8;
+  --sky:#E8F4FA;--white:#FFFFFF;--slate:#4A5568;
+  --mist:#F0F6FB;--border:#C9DFF0;
+  --red:#C0392B;--green:#1E7A50;--amber:#B45309;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -36,7 +36,6 @@ body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;}
 .btn-hero:hover{background:rgba(255,255,255,.25);}
 .btn-hero-settings{background:#fff;color:var(--navy);}
 .btn-hero-settings:hover{background:#e8f4fa;}
-.hero-note{margin-top:12px;font-size:11px;color:rgba(255,255,255,.4);}
 
 /* NAV */
 .toc{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(10,22,40,.06);}
@@ -51,7 +50,7 @@ body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;}
 .section{margin-bottom:40px;scroll-margin-top:56px;}
 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
 .section-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
-.icon-cred{background:#EBF5FF;} .icon-phone{background:#EBF5FF;} .icon-lab{background:#F0FBF4;} .icon-tech{background:#FFF7EB;} .icon-extra{background:#F0F4FF;}
+.icon-cred{background:#EBF5FF;}.icon-phone{background:#EBF5FF;}.icon-lab{background:#F0FBF4;}.icon-tech{background:#FFF7EB;}.icon-extra{background:#F0F4FF;}
 .section-title{font-size:18px;font-weight:700;color:var(--navy);letter-spacing:-.01em;}
 .section-rule{border:none;border-top:1px solid var(--border);margin-bottom:20px;}
 
@@ -67,6 +66,7 @@ body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;}
 .cred-row{display:flex;gap:6px;align-items:baseline;margin-bottom:3px;}
 .cred-label{font-size:11px;color:var(--slate);width:60px;flex-shrink:0;}
 .cred-val{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--navy);font-weight:500;word-break:break-all;}
+.cred-note{font-size:11px;color:var(--slate);margin-top:3px;font-style:italic;}
 
 /* PHONE */
 .phone-list{display:flex;flex-direction:column;gap:6px;}
@@ -90,9 +90,15 @@ body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;}
 .task-item h4{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;}
 .task-item p{font-size:13px;color:var(--slate);line-height:1.5;}
 
-/* PATH LINKS */
-.path{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--mist);border:1px solid var(--border);border-radius:4px;padding:3px 8px;color:var(--ocean);margin-top:5px;word-break:break-all;text-decoration:none;transition:background .15s,border-color .15s;}
-a.path:hover{background:var(--sky);border-color:var(--teal);}
+/* PATH — copyable chip, no broken link */
+.path-chip{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--mist);border:1px solid var(--border);border-radius:4px;padding:3px 6px 3px 8px;color:var(--ocean);margin-top:5px;max-width:100%;}
+.path-text{word-break:break-all;flex:1;}
+.copy-path{background:var(--sky);border:1px solid var(--border);border-radius:3px;padding:2px 7px;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;color:var(--ocean);cursor:pointer;flex-shrink:0;transition:background .1s;}
+.copy-path:hover{background:var(--teal);color:#fff;border-color:var(--teal);}
+.copy-path.copied{background:var(--green);color:#fff;border-color:var(--green);}
+/* External http links stay clickable */
+a.path-link{display:inline-flex;align-items:center;gap:5px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--mist);border:1px solid var(--border);border-radius:4px;padding:3px 8px;color:var(--ocean);margin-top:5px;word-break:break-all;text-decoration:none;transition:background .15s;}
+a.path-link:hover{background:var(--sky);border-color:var(--teal);}
 
 /* HW */
 .hw-grid{display:flex;flex-direction:column;gap:6px;}
@@ -117,16 +123,16 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
 .extra-section{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .extra-toolbar{background:var(--sky);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
 .extra-toolbar span{font-size:12px;font-weight:600;color:var(--ocean);text-transform:uppercase;letter-spacing:.04em;}
-.btn-small{background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--navy);cursor:pointer;font-family:'Inter',sans-serif;transition:background .1s,border-color .1s;}
+.btn-small{background:#fff;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--navy);cursor:pointer;font-family:'Inter',sans-serif;transition:background .1s;}
 .btn-small:hover{background:var(--sky);border-color:var(--teal);}
 .btn-add{background:var(--teal);border:1px solid var(--teal);color:#fff;}
 .btn-add:hover{background:var(--ocean);border-color:var(--ocean);}
 .extra-entries{padding:14px 16px;}
 .extra-entry{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px;}
 .extra-entry-head{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--mist);border-bottom:1px solid var(--border);}
-.entry-title-input{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--navy);background:none;border:none;outline:none;flex:1;cursor:text;}
+.entry-title-input{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--navy);background:none;border:none;outline:none;flex:1;}
 .entry-title-input:focus{background:#fff;border-radius:4px;padding:2px 6px;border:1px solid var(--teal);}
-.btn-remove{background:none;border:none;cursor:pointer;color:var(--slate);font-size:16px;line-height:1;padding:0 4px;font-family:'Inter',sans-serif;transition:color .1s;}
+.btn-remove{background:none;border:none;cursor:pointer;color:var(--slate);font-size:16px;line-height:1;padding:0 4px;transition:color .1s;}
 .btn-remove:hover{color:var(--red);}
 .entry-body-input{width:100%;padding:10px 12px;font-family:'Inter',sans-serif;font-size:13px;color:var(--navy);background:#fff;border:none;outline:none;resize:vertical;min-height:70px;line-height:1.55;}
 .entry-body-input:focus{background:#FAFEFF;box-shadow:inset 0 0 0 1px var(--teal);}
@@ -140,9 +146,7 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
 /* FOOTER */
 .footer{background:var(--navy);color:rgba(255,255,255,.45);text-align:center;font-size:12px;padding:20px;}
 
-/* ══════════════════════════════════════════
-   SETTINGS PANEL
-══════════════════════════════════════════ */
+/* SETTINGS DRAWER */
 .settings-overlay{position:fixed;inset:0;background:rgba(10,22,40,.5);z-index:200;display:none;backdrop-filter:blur(3px);}
 .settings-overlay.open{display:block;}
 .settings-drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,100vw);background:#fff;z-index:201;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:-4px 0 24px rgba(10,22,40,.15);}
@@ -152,20 +156,14 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
 .settings-head p{font-size:12px;color:rgba(255,255,255,.5);margin-top:2px;}
 .btn-close{background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
 .btn-close:hover{background:rgba(255,255,255,.22);}
-
-/* Tab nav inside settings */
 .settings-tabs{display:flex;background:var(--mist);border-bottom:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;}
 .settings-tabs::-webkit-scrollbar{display:none;}
 .stab{background:none;border:none;border-bottom:2px solid transparent;padding:11px 16px;font-size:12px;font-weight:600;color:var(--slate);cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;transition:color .15s,border-color .15s;}
 .stab:hover{color:var(--teal);}
 .stab.active{color:var(--ocean);border-bottom-color:var(--teal);}
-
-/* Settings body */
 .settings-body{flex:1;overflow-y:auto;padding:20px 24px;}
 .settings-panel{display:none;}
 .settings-panel.active{display:block;}
-
-/* Form elements */
 .s-group{margin-bottom:20px;}
 .s-group-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border);}
 .s-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;}
@@ -175,22 +173,33 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
 .s-input:focus{border-color:var(--teal);background:#fff;}
 .s-textarea{min-height:60px;resize:vertical;line-height:1.5;}
 .s-input.mono{font-family:'JetBrains Mono',monospace;font-size:12px;}
-
-/* Settings cards (credential items, phone items, etc.) */
 .s-card{background:var(--mist);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;position:relative;}
 .s-card-title{font-size:12px;font-weight:700;color:var(--ocean);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;}
 .s-del{position:absolute;top:10px;right:10px;background:none;border:none;cursor:pointer;color:var(--slate);font-size:14px;width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;}
 .s-del:hover{background:#FEE2E2;color:var(--red);}
 .btn-add-item{background:none;border:1px dashed var(--border);border-radius:8px;padding:9px;width:100%;font-family:'Inter',sans-serif;font-size:12px;font-weight:600;color:var(--teal);cursor:pointer;transition:background .15s,border-color .15s;margin-top:4px;}
 .btn-add-item:hover{background:var(--sky);border-color:var(--teal);}
-
-/* Settings footer */
 .settings-footer{padding:14px 24px;background:var(--mist);border-top:1px solid var(--border);display:flex;gap:10px;flex-shrink:0;}
 .btn-apply{flex:1;background:var(--teal);border:none;color:#fff;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;}
 .btn-apply:hover{background:var(--ocean);}
 .btn-reset{background:none;border:1px solid var(--border);color:var(--slate);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;padding:10px 16px;border-radius:8px;cursor:pointer;transition:background .15s;}
 .btn-reset:hover{background:#FEE2E2;color:var(--red);border-color:#FCA5A5;}
 .apply-status{font-size:12px;color:var(--green);align-self:center;min-width:80px;text-align:right;}
+
+/* PDF MODAL */
+.pdf-modal-overlay{position:fixed;inset:0;background:rgba(10,22,40,.6);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.pdf-modal-overlay.open{display:flex;}
+.pdf-modal{background:#fff;border-radius:14px;padding:32px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(10,22,40,.3);text-align:center;}
+.pdf-modal h3{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+.pdf-modal p{font-size:13px;color:var(--slate);line-height:1.6;margin-bottom:20px;}
+.pdf-steps{text-align:left;background:var(--mist);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:20px;}
+.pdf-steps li{font-size:13px;color:var(--slate);line-height:1.7;margin-left:16px;}
+.pdf-steps li strong{color:var(--navy);}
+.pdf-modal-btns{display:flex;gap:10px;}
+.btn-pdf-print{flex:1;background:var(--teal);border:none;color:#fff;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;padding:11px;border-radius:8px;cursor:pointer;transition:background .15s;}
+.btn-pdf-print:hover{background:var(--ocean);}
+.btn-pdf-cancel{background:none;border:1px solid var(--border);color:var(--slate);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:11px 18px;border-radius:8px;cursor:pointer;}
+.btn-pdf-cancel:hover{background:var(--mist);}
 
 @media(max-width:600px){
   .hero{padding:40px 20px 36px;}
@@ -201,25 +210,40 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
   .phone-num{width:54px;}
   .s-row{flex-direction:column;}
 }
-@media(prefers-reduced-motion:reduce){*{transition:none!important;}}
 
-/* ── PRINT / PDF ── */
-@media print {
-  @page { margin: 18mm 16mm; size: A4; }
-  .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 32px 24px 28px; }
-  .toc, .settings-overlay, .settings-drawer, .hero-btns, .hero-note,
-  .save-notice, .extra-toolbar { display: none !important; }
-  .main { padding: 16px 0; }
-  .section { break-inside: avoid; margin-bottom: 24px; }
-  .cred-item, .phone-item, .task-item, .hw-item, .check-item, .extra-entry { break-inside: avoid; }
-  .card { break-inside: avoid; }
-  body { font-size: 12px; }
-  .hero h1 { font-size: 26px; }
-  a.path { color: var(--ocean) !important; text-decoration: none; }
+/* PRINT STYLES */
+@media print{
+  @page{margin:15mm 12mm;size:A4;}
+  .toc,.settings-overlay,.settings-drawer,.hero-btns,
+  .save-notice,.extra-toolbar,.pdf-modal-overlay{display:none!important;}
+  .hero{-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:28px 20px;}
+  .main{padding:12px 0;}
+  .section{break-inside:avoid;margin-bottom:20px;}
+  .cred-item,.phone-item,.task-item,.hw-item,.check-item{break-inside:avoid;}
+  body{font-size:12px;}
+  .copy-path{display:none;}
+  .path-chip{border:1px solid #ccc;background:#f5f5f5;}
 }
 </style>
 </head>
 <body>
+
+<!-- PDF MODAL -->
+<div class="pdf-modal-overlay" id="pdfModal">
+  <div class="pdf-modal">
+    <h3>📄 Save as PDF</h3>
+    <p>Use your browser's built-in Print function to save as PDF. It takes 3 seconds:</p>
+    <ol class="pdf-steps">
+      <li><strong>Click "Open Print Dialog"</strong> below</li>
+      <li>In the dialog, set <strong>Destination → Save as PDF</strong></li>
+      <li>Click <strong>Save</strong> — done!</li>
+    </ol>
+    <div class="pdf-modal-btns">
+      <button class="btn-pdf-print" onclick="doPrint()">🖨️ Open Print Dialog</button>
+      <button class="btn-pdf-cancel" onclick="closePdfModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <!-- SETTINGS OVERLAY -->
 <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
@@ -229,14 +253,14 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
   <div class="settings-head">
     <div>
       <h2>⚙️ Edit Handover Notes</h2>
-      <p>All changes save automatically to this browser</p>
+      <p>All changes save automatically</p>
     </div>
     <button class="btn-close" onclick="closeSettings()">✕</button>
   </div>
   <div class="settings-tabs" id="settingsTabs">
     <button class="stab active" onclick="switchTab('hero')">Header</button>
     <button class="stab" onclick="switchTab('creds')">Credentials</button>
-    <button class="stab" onclick="switchTab('phones')">Phone Numbers</button>
+    <button class="stab" onclick="switchTab('phones')">Phones</button>
     <button class="stab" onclick="switchTab('tasks')">Lab Tasks</button>
     <button class="stab" onclick="switchTab('hardware')">Hardware</button>
     <button class="stab" onclick="switchTab('checklist')">Checklist</button>
@@ -247,31 +271,21 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
     <div class="settings-panel active" id="sp-hero">
       <div class="s-group">
         <div class="s-group-title">Page Header</div>
-        <div class="s-row">
-          <div class="s-field"><label>Ship Tag</label><input class="s-input" id="s-ship-tag" placeholder="🚢 Norwegian Aqua"></div>
-        </div>
-        <div class="s-row">
-          <div class="s-field"><label>Title</label><input class="s-input" id="s-title" placeholder="APMP Handover Notes"></div>
-        </div>
-        <div class="s-row">
-          <div class="s-field"><label>Subtitle</label><input class="s-input" id="s-subtitle" placeholder="Assistant Photo Manager..."></div>
-        </div>
+        <div class="s-row"><div class="s-field"><label>Ship Tag</label><input class="s-input" id="s-ship-tag"></div></div>
+        <div class="s-row"><div class="s-field"><label>Title</label><input class="s-input" id="s-title"></div></div>
+        <div class="s-row"><div class="s-field"><label>Subtitle</label><input class="s-input" id="s-subtitle"></div></div>
       </div>
       <div class="s-group">
-        <div class="s-group-title">Badge Info</div>
+        <div class="s-group-title">Badges</div>
         <div class="s-row">
-          <div class="s-field"><label>Ship</label><input class="s-input" id="s-badge-ship" placeholder="Norwegian Aqua"></div>
-          <div class="s-field"><label>Role</label><input class="s-input" id="s-badge-role" placeholder="Asst. Photo Manager"></div>
+          <div class="s-field"><label>Ship</label><input class="s-input" id="s-badge-ship"></div>
+          <div class="s-field"><label>Role</label><input class="s-input" id="s-badge-role"></div>
         </div>
-        <div class="s-row">
-          <div class="s-field"><label>Department</label><input class="s-input" id="s-badge-dept" placeholder="Photography &amp; Retail"></div>
-        </div>
+        <div class="s-row"><div class="s-field"><label>Department</label><input class="s-input" id="s-badge-dept"></div></div>
       </div>
       <div class="s-group">
-        <div class="s-group-title">Footer Text</div>
-        <div class="s-row">
-          <div class="s-field"><label>Footer</label><input class="s-input" id="s-footer" placeholder="Norwegian Aqua · APMP Handover Reference..."></div>
-        </div>
+        <div class="s-group-title">Footer</div>
+        <div class="s-row"><div class="s-field"><label>Footer Text</label><input class="s-input" id="s-footer"></div></div>
       </div>
     </div>
 
@@ -313,12 +327,10 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
       <div class="s-group" style="margin-top:20px;">
         <div class="s-group-title">YubiKey</div>
         <div class="s-row">
-          <div class="s-field"><label>Serial No.</label><input class="s-input mono" id="s-yubi-sn" placeholder="34816232"></div>
-          <div class="s-field"><label>Account</label><input class="s-input mono" id="s-yubi-acct" placeholder="photolab422"></div>
+          <div class="s-field"><label>Serial No.</label><input class="s-input mono" id="s-yubi-sn"></div>
+          <div class="s-field"><label>Account</label><input class="s-input mono" id="s-yubi-acct"></div>
         </div>
-        <div class="s-row">
-          <div class="s-field"><label>Assigned To</label><input class="s-input" id="s-yubi-name" placeholder="AQUA Assistant Photo Manager Production"></div>
-        </div>
+        <div class="s-row"><div class="s-field"><label>Assigned To</label><input class="s-input" id="s-yubi-name"></div></div>
       </div>
     </div>
 
@@ -348,10 +360,9 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
       <div class="hero-badge"><span>Department</span><strong id="pg-badge-dept">Photography &amp; Retail</strong></div>
       <div class="hero-btns">
         <button class="btn-hero btn-hero-settings" onclick="openSettings()">⚙️ Edit / Settings</button>
-        <button class="btn-hero" onclick="downloadPDF()">⬇ Download PDF</button>
+        <button class="btn-hero" onclick="openPdfModal()">📄 Download PDF</button>
       </div>
     </div>
-    <p class="hero-note">📁 Local drive links work when this file is saved and opened from your computer.</p>
   </div>
 </header>
 
@@ -369,63 +380,36 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
 
 <main class="main">
 
-  <!-- CREDENTIALS -->
   <section class="section" id="credentials">
-    <div class="section-header">
-      <div class="section-icon icon-cred">🔐</div>
-      <h2 class="section-title">Credentials</h2>
-    </div>
+    <div class="section-header"><div class="section-icon icon-cred">🔐</div><h2 class="section-title">Credentials</h2></div>
     <hr class="section-rule">
     <div class="cred-grid" id="pg-creds"></div>
   </section>
 
-  <!-- PHONE NUMBERS -->
   <section class="section" id="phones">
-    <div class="section-header">
-      <div class="section-icon icon-phone">📞</div>
-      <h2 class="section-title">Important Phone Numbers</h2>
-    </div>
+    <div class="section-header"><div class="section-icon icon-phone">📞</div><h2 class="section-title">Important Phone Numbers</h2></div>
     <hr class="section-rule">
-    <div class="card" style="margin-bottom:10px;">
-      <div class="card-head">💡 All contacts saved on phone ext. 23871 — press the button to browse.</div>
-    </div>
+    <div class="card" style="margin-bottom:10px;"><div class="card-head">💡 All contacts saved on phone ext. 23871 — press the button to browse.</div></div>
     <div class="phone-list" id="pg-phones"></div>
   </section>
 
-  <!-- LAB OPERATIONS -->
   <section class="section" id="lab">
-    <div class="section-header">
-      <div class="section-icon icon-lab">🗂️</div>
-      <h2 class="section-title">Lab Operations</h2>
-    </div>
+    <div class="section-header"><div class="section-icon icon-lab">🗂️</div><h2 class="section-title">Lab Operations</h2></div>
     <hr class="section-rule">
-    <div class="task-group">
-      <div class="priority-tag priority-urgent">Daily — Urgent</div>
-      <div class="task-list" id="pg-tasks-daily"></div>
-    </div>
-    <div class="task-group">
-      <div class="priority-tag priority-weekly">Weekly — Normal</div>
-      <div class="task-list" id="pg-tasks-weekly"></div>
-    </div>
-    <div class="task-group">
-      <div class="priority-tag priority-monthly">Monthly — Low Priority</div>
-      <div class="task-list" id="pg-tasks-monthly"></div>
-    </div>
+    <div class="task-group"><div class="priority-tag priority-urgent">Daily — Urgent</div><div class="task-list" id="pg-tasks-daily"></div></div>
+    <div class="task-group"><div class="priority-tag priority-weekly">Weekly — Normal</div><div class="task-list" id="pg-tasks-weekly"></div></div>
+    <div class="task-group"><div class="priority-tag priority-monthly">Monthly — Low Priority</div><div class="task-list" id="pg-tasks-monthly"></div></div>
   </section>
 
-  <!-- HARDWARE -->
   <section class="section" id="hardware">
-    <div class="section-header">
-      <div class="section-icon icon-tech">🖨️</div>
-      <h2 class="section-title">Software &amp; Hardware</h2>
-    </div>
+    <div class="section-header"><div class="section-icon icon-tech">🖨️</div><h2 class="section-title">Software &amp; Hardware</h2></div>
     <hr class="section-rule">
     <div class="card" style="margin-bottom:16px;">
       <div class="card-head">Darkroom Setup</div>
       <div class="card-body" style="font-size:13px;color:var(--slate);">
         All sizes enabled. Tilepix photos → Printer 1. All other sizes → Main 1.<br><br>
-        <strong style="color:var(--navy);">Tutorial:</strong>
-        <a class="path" href="file://aqua.ncl.com/users/photolab422/Documents/Tutorial%20Video/Darkroom%20Printing">🌐 \\aqua.ncl.com\users\photolab422\Documents\Tutorial Video\Darkroom Printing</a>
+        <strong style="color:var(--navy);">Tutorial path:</strong>
+        <span class="path-chip"><span class="path-text">\\aqua.ncl.com\users\photolab422\Documents\Tutorial Video\Darkroom Printing</span><button class="copy-path" onclick="copyPath(this,'\\\\aqua.ncl.com\\users\\photolab422\\Documents\\Tutorial Video\\Darkroom Printing')">Copy</button></span>
       </div>
     </div>
     <div class="hw-grid" id="pg-hw"></div>
@@ -437,7 +421,7 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
           <div class="yubi-field"><label>Account</label><span id="pg-yubi-acct">photolab422</span></div>
           <div class="yubi-field"><label>Assigned To</label><span id="pg-yubi-name">AQUA Assistant Photo Manager Production</span></div>
         </div>
-        <p style="font-size:13px;color:var(--slate);margin-bottom:8px;">OKTA login at <a href="https://nclh.okta.com/" style="color:var(--teal);" target="_blank">https://nclh.okta.com/</a></p>
+        <p style="font-size:13px;color:var(--slate);margin-bottom:8px;">OKTA login at <a href="https://nclh.okta.com/" style="color:var(--teal);" target="_blank" rel="noopener">https://nclh.okta.com/</a></p>
         <ol style="font-size:13px;color:var(--slate);padding-left:18px;line-height:1.7;">
           <li>Enter Windows credentials (username &amp; password)</li>
           <li>MFA step — insert then tap YubiKey</li>
@@ -446,23 +430,15 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
     </div>
   </section>
 
-  <!-- DAILY CHECKLIST -->
   <section class="section" id="checklist">
-    <div class="section-header">
-      <div class="section-icon icon-tech">✅</div>
-      <h2 class="section-title">Daily Checklist — Guest Facing Technology</h2>
-    </div>
+    <div class="section-header"><div class="section-icon icon-tech">✅</div><h2 class="section-title">Daily Checklist — Guest Facing Technology</h2></div>
     <hr class="section-rule">
     <p style="font-size:13px;color:var(--slate);margin-bottom:14px;">Photographer checks all areas and reports to WhatsApp group with photo.</p>
     <div class="checklist" id="pg-checklist"></div>
   </section>
 
-  <!-- ADDITIONAL INFO -->
   <section class="section" id="extra">
-    <div class="section-header">
-      <div class="section-icon icon-extra">📝</div>
-      <h2 class="section-title">Additional Information</h2>
-    </div>
+    <div class="section-header"><div class="section-icon icon-extra">📝</div><h2 class="section-title">Additional Information</h2></div>
     <hr class="section-rule">
     <div class="extra-section">
       <div class="extra-toolbar">
@@ -483,219 +459,221 @@ a.path:hover{background:var(--sky);border-color:var(--teal);}
   </section>
 
 </main>
-
-<footer class="footer" id="pg-footer">
-  Norwegian Aqua · APMP Handover Reference · Photography &amp; Retail Department
-</footer>
+<footer class="footer" id="pg-footer">Norwegian Aqua · APMP Handover Reference · Photography &amp; Retail Department</footer>
 
 <script>
-// ══════════════════════════════════════════
-// DEFAULT DATA
-// ══════════════════════════════════════════
+// ══════════════════════════════
+// DEFAULTS
+// ══════════════════════════════
 const DEFAULTS = {
-  hero: {
-    shipTag: '🚢 Norwegian Aqua',
-    title: 'APMP Handover Notes',
-    subtitle: 'Assistant Photo Manager — Production Handover Reference',
-    badgeShip: 'Norwegian Aqua',
-    badgeRole: 'Asst. Photo Manager',
-    badgeDept: 'Photography & Retail',
-    footer: 'Norwegian Aqua · APMP Handover Reference · Photography & Retail Department'
-  },
-  creds: [
-    { service:'Windows',             user:'Photolab422',          pass:'Isaiah@3416',   note:'' },
-    { service:'Photographer Account',user:'Photostaff422',        pass:'Bluesky299!',   note:'' },
-    { service:'Adobe',               user:'apho422@ncl.com',      pass:'Ph0t0gr@2025!', note:'' },
-    { service:'My Moment Printer',   user:'',                     pass:'Adventa1983',   note:'' },
-    { service:'Box',                 user:'photolab422@ncl.com',  pass:'auto login',    note:'' },
-    { service:'MXP',                 user:'AQUASSTPHOTOMGR',      pass:'Bermuda2026!!', note:'' },
-    { service:'QuickBase',           user:'photolab422@ncl.com',  pass:'auto login',    note:'' },
-    { service:'Otalio',              user:'0128625@nclhcrew.com', pass:'Isaiah@3416',   note:'' }
+  hero:{shipTag:'🚢 Norwegian Aqua',title:'APMP Handover Notes',subtitle:'Assistant Photo Manager — Production Handover Reference',badgeShip:'Norwegian Aqua',badgeRole:'Asst. Photo Manager',badgeDept:'Photography & Retail',footer:'Norwegian Aqua · APMP Handover Reference · Photography & Retail Department'},
+  creds:[
+    {service:'Windows',            user:'Photolab422',          pass:'Isaiah@3416',   note:''},
+    {service:'Photographer Account',user:'Photostaff422',       pass:'Bluesky299!',   note:''},
+    {service:'Adobe',              user:'apho422@ncl.com',       pass:'Ph0t0gr@2025!', note:''},
+    {service:'My Moment Printer',  user:'',                      pass:'Adventa1983',   note:''},
+    {service:'Box',                user:'photolab422@ncl.com',   pass:'auto login',    note:''},
+    {service:'MXP',                user:'AQUASSTPHOTOMGR',       pass:'Bermuda2026!!', note:''},
+    {service:'QuickBase',          user:'photolab422@ncl.com',   pass:'auto login',    note:''},
+    {service:'Otalio',             user:'0128625@nclhcrew.com',  pass:'Isaiah@3416',   note:''}
   ],
-  phones: [
-    { num:'23870', name:'Photo Manager',          note:'', urgent:true  },
-    { num:'23872', name:'APMS',                   note:'', urgent:true  },
-    { num:'28404', name:'Gallery',                note:'', urgent:true  },
-    { num:'24301', name:'Photo Lab',              note:'', urgent:true  },
-    { num:'23873', name:'PPS',                    note:'', urgent:true  },
-    { num:'23875', name:'Senior Photographer',    note:'', urgent:true  },
-    { num:'29876', name:'IT on Duty',             note:'IT Office — Deck 13, Cabin 13222. Use the aft crew elevator.', urgent:true },
-    { num:'25821', name:'Linenkeeeper Assistant', note:'Deck 4 Forward, next to tailor and crew laundry. Contact: Mark.', urgent:false },
-    { num:'25880', name:'Housekeeping Head Cleaner', note:'Contact if you need to use the signage wee barrow — ask for Wiandre.', urgent:false },
-    { num:'29953', name:'Electronic Engineer',    note:'Call for help with Super Selfie, Wave Cam, and Slide Coaster (Deck 8) restarts.', urgent:false },
-    { num:'25842', name:'Printer',                note:'', urgent:false },
-    { num:'27918', name:'Recreation Manager',     note:'Personal contact — can check if Slide Coaster on Deck 19 is working.', urgent:false },
-    { num:'29811', name:'Chief Carpenter',        note:'Personal contact.', urgent:false },
-    { num:'28803', name:'ECO',                    note:'Personal contact for offloading.', urgent:false },
-    { num:'27942 / 27945', name:'Shore Ex Staff', note:'For BTS — call when photographer needs to deliver photos.', urgent:false },
-    { num:'28955', name:'Provision',              note:'For Hard Check and provision-related requests.', urgent:false }
+  phones:[
+    {num:'23870',name:'Photo Manager',          note:'',urgent:true},
+    {num:'23872',name:'APMS',                   note:'',urgent:true},
+    {num:'28404',name:'Gallery',                note:'',urgent:true},
+    {num:'24301',name:'Photo Lab',              note:'',urgent:true},
+    {num:'23873',name:'PPS',                    note:'',urgent:true},
+    {num:'23875',name:'Senior Photographer',    note:'',urgent:true},
+    {num:'29876',name:'IT on Duty',             note:'IT Office — Deck 13, Cabin 13222. Use the aft crew elevator.',urgent:true},
+    {num:'25821',name:'Linenkeeeper Assistant', note:'Deck 4 Forward, next to tailor and crew laundry. Contact: Mark.',urgent:false},
+    {num:'25880',name:'Housekeeping Head Cleaner',note:'Contact if you need signage wee barrow — ask for Wiandre.',urgent:false},
+    {num:'29953',name:'Electronic Engineer',    note:'Call for Super Selfie, Wave Cam, Slide Coaster (Deck 8) restarts.',urgent:false},
+    {num:'25842',name:'Printer',                note:'',urgent:false},
+    {num:'27918',name:'Recreation Manager',     note:'Personal contact — can check if Slide Coaster Deck 19 is working.',urgent:false},
+    {num:'29811',name:'Chief Carpenter',        note:'Personal contact.',urgent:false},
+    {num:'28803',name:'ECO',                    note:'Personal contact for offloading.',urgent:false},
+    {num:'27942 / 27945',name:'Shore Ex Staff', note:'For BTS — call when photographer needs to deliver photos.',urgent:false},
+    {num:'28955',name:'Provision',              note:'For Hard Check and provision-related requests.',urgent:false}
   ],
-  tasks: {
-    daily: [
-      { title:'Photo Lab Supplies',    desc:'Order from Linenkeeeper, Deck 4 Forward. Hours: 9am–12pm. Pickup next day — call 25821 to confirm. Contact: Mark.',  path:'',  pathUrl:'' },
-      { title:'Posing Guide',          desc:'Print weekly and distribute at briefing. Give to new hires on start day.',  path:'', pathUrl:'' },
-      { title:'Setup Schedule',        desc:'Check daily. Photographer on Portraits also handles studio setup. Two people per studio on Decks 6, 7, 8. Deck 8 Walkway needs one person only.',  path:'', pathUrl:'' },
-      { title:'Image Count — Cruise Planner', desc:'Update daily.', path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\2. Cruise Planner\\Regular Cruise Planner', pathUrl:'file:///Z:/NCL%20Photo%20Tree%20-%20V3%2011.08.23/1.%20REPORTS/2.%20Cruise%20Planner/Regular%20Cruise%20Planner' },
-      { title:'Dining Target',         desc:"Wiandre's spreadsheet. Put target on whiteboard. Ask Wiandre if unsure.", path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\3. Administrative\\1. CMS cruise report\\Dining Room Tracker', pathUrl:'file:///Z:/NCL%20Photo%20Tree%20-%20V3%2011.08.23/1.%20REPORTS/3.%20Administrative/1.%20CMS%20cruise%20report/Dining%20Room%20Tracker' },
-      { title:'Time Sheet',            desc:'Update daily.',  path:'', pathUrl:'' },
-      { title:'Good and Bad Photo',    desc:'Share with Wiandre for the meeting.',  path:'Z:\\Prints\\Fuji\\Main 1\\Good and Bad Photo', pathUrl:'file:///Z:/Prints/Fuji/Main%201/Good%20and%20Bad%20Photo' },
-      { title:'Sample Image (Monthly)',desc:'Create a temporary folder on Main 1.',  path:'Z:\\Prints\\Fuji\\Main 1\\Good and Bad Photo', pathUrl:'file:///Z:/Prints/Fuji/Main%201/Good%20and%20Bad%20Photo' },
-      { title:'Photographer Feedback', desc:'Log daily performance observations in Crew Performance Log. Save to C Drive — confidential.', path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\3. Administrative\\9. Evaluation\\Crew Performance Log', pathUrl:'file:///Z:/NCL%20Photo%20Tree%20-%20V3%2011.08.23/1.%20REPORTS/3.%20Administrative/9.%20Evaluation%20-%20save%20on%20C%20Drive%20due%20to%20confidentiality/Crew%20Performance%20Log' },
-      { title:'Delivery — Housekeeping', desc:'Delivery rack sorted: 5-9-10 / 11-12 / 13 / 14 / 15-16 (two numbers on each tray).', path:'\\\\aqua.ncl.com\\users\\photolab422\\Documents\\Tutorial Video\\Cabin Area Code', pathUrl:'file://aqua.ncl.com/users/photolab422/Documents/Tutorial%20Video/Cabin%20Area%20Code' }
+  tasks:{
+    daily:[
+      {title:'Photo Lab Supplies',     desc:'Order from Linenkeeeper, Deck 4 Forward. Hours: 9am–12pm. Pickup next day — call 25821. Contact: Mark.',path:''},
+      {title:'Posing Guide',           desc:'Print weekly and distribute at briefing. Give to new hires on start day.',path:''},
+      {title:'Setup Schedule',         desc:'Check daily. Photographer on Portraits also handles studio setup. Two people per studio on Decks 6, 7, 8. Deck 8 Walkway needs one person only.',path:''},
+      {title:'Image Count — Cruise Planner',desc:'Update daily.',path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\2. Cruise Planner\\Regular Cruise Planner'},
+      {title:'Dining Target',          desc:"Wiandre's spreadsheet. Put target on whiteboard. Ask Wiandre if unsure.",path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\3. Administrative\\1. CMS cruise report\\Dining Room Tracker'},
+      {title:'Time Sheet',             desc:'Update daily.',path:''},
+      {title:'Good and Bad Photo',     desc:'Share with Wiandre for the meeting.',path:'Z:\\Prints\\Fuji\\Main 1\\Good and Bad Photo'},
+      {title:'Sample Image (Monthly)', desc:'Create a temporary folder on Main 1.',path:'Z:\\Prints\\Fuji\\Main 1\\Good and Bad Photo'},
+      {title:'Photographer Feedback',  desc:'Log daily performance in Crew Performance Log. Save to C Drive — confidential.',path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\3. Administrative\\9. Evaluation\\Crew Performance Log'},
+      {title:'Delivery — Housekeeping',desc:'Delivery rack sorted: 5-9-10 / 11-12 / 13 / 14 / 15-16 (two numbers on each tray).',path:'\\\\aqua.ncl.com\\users\\photolab422\\Documents\\Tutorial Video\\Cabin Area Code'}
     ],
-    weekly: [
-      { title:'Inventory',             desc:'Update form, email to Wiandre, then order via MXP once approved.',  path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\3. Administrative\\15. Inventory\\Photo Lab Consumption\\2026', pathUrl:'file:///Z:/NCL%20Photo%20Tree%20-%20V3%2011.08.23/1.%20REPORTS/3.%20Administrative/15.%20Inventory/Photo%20Lab%20Consumption/2026' },
-      { title:'Embarkation Printing',  desc:'',  path:'\\\\aqua.ncl.com\\users\\photolab422\\Documents\\Tutorial Video\\Embarkation Printing', pathUrl:'file://aqua.ncl.com/users/photolab422/Documents/Tutorial%20Video/Embarkation%20Printing' },
-      { title:'Order MXP',             desc:'Double-check with Wiandre before ordering store. Done on embarkation day.',  path:'', pathUrl:'' },
-      { title:'Pickup Store',          desc:'Second day of cruise. Call Linenkeeeper (25821) — Mark.',  path:'', pathUrl:'' },
-      { title:'Cabin Drop Flyers',     desc:'Order from Linenkeeeper. Printshop has Photobook insert included with Port & Shopping flyers. Leave one box at printshop; deduct from weekly inventory.',  path:'', pathUrl:'' },
-      { title:'Printer Counts — DX100',desc:'Record on QuickBase at start of cruise before sailing.',  path:'', pathUrl:'' },
-      { title:'Printer Maintenance — DX100', desc:'Run head maintenance and cleaning roller. Vacuum cleaner preferred.',  path:'', pathUrl:'' },
-      { title:'Epson Printer Maintenance', desc:'',  path:'', pathUrl:'' },
-      { title:'Setup Event',           desc:'Set up events in the middle of the cruise.',  path:'', pathUrl:'' },
-      { title:'Cruise Planner',        desc:'Wiandre will email adjustments — changes for backdrop and production-related items only.',  path:'', pathUrl:'' }
+    weekly:[
+      {title:'Inventory',              desc:'Update form, email to Wiandre, then order via MXP once approved.',path:'Z:\\NCL Photo Tree - V3 11.08.23\\1. REPORTS\\3. Administrative\\15. Inventory\\Photo Lab Consumption\\2026'},
+      {title:'Embarkation Printing',   desc:'',path:'\\\\aqua.ncl.com\\users\\photolab422\\Documents\\Tutorial Video\\Embarkation Printing'},
+      {title:'Order MXP',              desc:'Double-check with Wiandre before ordering. Done on embarkation day.',path:''},
+      {title:'Pickup Store',           desc:'Second day of cruise. Call Linenkeeeper (25821) — Mark.',path:''},
+      {title:'Cabin Drop Flyers',      desc:'Order from Linenkeeeper. Printshop has Photobook insert with Port & Shopping flyers. Leave one box at printshop; deduct from weekly inventory.',path:''},
+      {title:'Printer Counts — DX100', desc:'Record on QuickBase at start of cruise before sailing.',path:''},
+      {title:'Printer Maintenance — DX100',desc:'Run head maintenance and cleaning roller. Vacuum cleaner preferred.',path:''},
+      {title:'Epson Printer Maintenance',desc:'',path:''},
+      {title:'Setup Event',            desc:'Set up events in the middle of the cruise.',path:''},
+      {title:'Cruise Planner',         desc:'Wiandre will email adjustments — backdrop and production items only.',path:''}
     ],
-    monthly: [
-      { title:'On the Job Training (OJT)', desc:'Safety Briefing: one form (5-min breakdown) for all, one form for Safety Practices, one extra training of your choice.',  path:'', pathUrl:'' },
-      { title:'Photo Sample Upload',   desc:'Upload monthly sample to Box.com.',  path:'https://ncl.app.box.com/folder/359119523904', pathUrl:'https://ncl.app.box.com/folder/359119523904' }
+    monthly:[
+      {title:'On the Job Training (OJT)',desc:'Safety Briefing: one form (5-min breakdown) for all, one for Safety Practices, one extra training of your choice.',path:''},
+      {title:'Photo Sample Upload',    desc:'Upload monthly sample to Box.com.',path:'https://ncl.app.box.com/folder/359119523904'}
     ]
   },
-  hw: [
-    { name:'Fujifilm DX100 #1', id:'23-1762', detail:'Installed on Production PC. Prints gallery signs and marketing material.' },
-    { name:'Fujifilm DX100 #2', id:'23-1763', detail:'Installed on Photostaff PC.' },
-    { name:'Fujifilm DX100 #3', id:'23-1764', detail:'Installed on Photostaff PC.' },
-    { name:'Fujifilm DX100 #4', id:'23-1765', detail:'Installed on Photostaff PC.' },
-    { name:'Fujifilm DX100 #5', id:'23-1766', detail:'Installed on Photostaff PC. LMS on Production PC set to Main 1 (direct print). Photographer PC set to reprint.' },
-    { name:'CX3240 Fuji Printer', id:'', detail:'Photo and Kiosk printer.' },
-    { name:'HP Printer',          id:'', detail:'For schedules, inventory sheets, OJT forms, etc.' },
-    { name:'Epson SC-P900',       id:'', detail:'Printer for Iris.' },
-    { name:'Citizen Printer',     id:'', detail:'Souvenir printer — scan barcode to print photo.' }
+  hw:[
+    {name:'Fujifilm DX100 #1',id:'23-1762',detail:'Installed on Production PC. Prints gallery signs and marketing material.'},
+    {name:'Fujifilm DX100 #2',id:'23-1763',detail:'Installed on Photostaff PC.'},
+    {name:'Fujifilm DX100 #3',id:'23-1764',detail:'Installed on Photostaff PC.'},
+    {name:'Fujifilm DX100 #4',id:'23-1765',detail:'Installed on Photostaff PC.'},
+    {name:'Fujifilm DX100 #5',id:'23-1766',detail:'Installed on Photostaff PC. LMS on Production PC → Main 1 (direct). Photographer PC → reprint.'},
+    {name:'CX3240 Fuji Printer',id:'',detail:'Photo and Kiosk printer.'},
+    {name:'HP Printer',id:'',detail:'For schedules, inventory sheets, OJT forms, etc.'},
+    {name:'Epson SC-P900',id:'',detail:'Printer for Iris.'},
+    {name:'Citizen Printer',id:'',detail:'Souvenir printer — scan barcode to print photo.'}
   ],
-  yubi: { sn:'34816232', acct:'photolab422', name:'AQUA Assistant Photo Manager Production' },
-  checklist: [
-    { title:'Waves Cam',          loc:'Deck 8', note:'If not working: call Electronic Engineer to restart power supply. Breaker: QR915500-4, Deck 12 FZ 5, next to cabin 12222 Portside.' },
-    { title:'Super Selfie',       loc:'Deck 8', note:'Restart daily — confirm correct UI is showing. Button is on the bottom of CPU.' },
-    { title:'Imagination Wall',   loc:'Gallery', note:'If password prompt appears, grab keyboard from gallery office and restart from there.' },
-    { title:'Slide Coaster Breaker', loc:'Deck 18', note:'Restart breaker daily — wait ~30 seconds before switching back on. Check sensor is responding to hand movement.' },
-    { title:'Studio Setup Confirmed', loc:'Decks 6, 7, 8', note:'Atrium Deck 6 · Atrium Stairs Deck 6 · Front Desk Deck 7 · Next to Gift Shop Deck 8' }
+  yubi:{sn:'34816232',acct:'photolab422',name:'AQUA Assistant Photo Manager Production'},
+  checklist:[
+    {title:'Waves Cam',loc:'Deck 8',note:'If not working: call Electronic Engineer to restart power supply. Breaker: QR915500-4, Deck 12 FZ 5, next to cabin 12222 Portside.'},
+    {title:'Super Selfie',loc:'Deck 8',note:'Restart daily — confirm correct UI is showing. Button is on the bottom of CPU.'},
+    {title:'Imagination Wall',loc:'Gallery',note:'If password prompt appears, grab keyboard from gallery office and restart from there.'},
+    {title:'Slide Coaster Breaker',loc:'Deck 18',note:'Restart breaker daily — wait ~30 seconds before switching back on. Check sensor responds to hand movement.'},
+    {title:'Studio Setup Confirmed',loc:'Decks 6, 7, 8',note:'Atrium Deck 6 · Atrium Stairs Deck 6 · Front Desk Deck 7 · Next to Gift Shop Deck 8'}
   ]
 };
 
-// ══════════════════════════════════════════
+// ══════════════════════════════
 // STATE
-// ══════════════════════════════════════════
-let DATA = {};
-let notes = [];
-let pendingData = {}; // working copy inside settings
+// ══════════════════════════════
+let DATA={}, notes=[], pendingData={};
 
-function loadData() {
-  try {
-    const saved = localStorage.getItem('apmp_data');
-    DATA = saved ? JSON.parse(saved) : deepClone(DEFAULTS);
-  } catch(e) { DATA = deepClone(DEFAULTS); }
-  try {
-    const sn = localStorage.getItem('apmp_notes');
-    notes = sn ? JSON.parse(sn) : [];
-  } catch(e) { notes = []; }
+function loadData(){
+  try{ const s=localStorage.getItem('apmp_data'); DATA=s?JSON.parse(s):deepClone(DEFAULTS); }catch(e){ DATA=deepClone(DEFAULTS); }
+  try{ const s=localStorage.getItem('apmp_notes'); notes=s?JSON.parse(s):[]; }catch(e){ notes=[]; }
+}
+function saveData(){ try{ localStorage.setItem('apmp_data',JSON.stringify(DATA)); }catch(e){} }
+function saveNotes(){
+  try{ localStorage.setItem('apmp_notes',JSON.stringify(notes)); }catch(e){}
+  const s=document.getElementById('notes-status');
+  s.textContent='Saved ✓'; setTimeout(()=>s.textContent='Notes auto-saved in browser.',2000);
+}
+function deepClone(o){ return JSON.parse(JSON.stringify(o)); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ══════════════════════════════
+// PATH CHIP — copy to clipboard
+// works everywhere (Vercel, local, any host)
+// ══════════════════════════════
+function copyPath(btn, path){
+  navigator.clipboard.writeText(path).then(()=>{
+    btn.textContent='✓ Copied'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
+  }).catch(()=>{
+    // fallback for older browsers
+    const ta=document.createElement('textarea');
+    ta.value=path; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent='✓ Copied'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
+  });
 }
 
-function saveData() {
-  try { localStorage.setItem('apmp_data', JSON.stringify(DATA)); } catch(e){}
+function renderPath(path){
+  if(!path) return '';
+  const isHttp = path.startsWith('http://') || path.startsWith('https://');
+  if(isHttp){
+    return `<a class="path-link" href="${esc(path)}" target="_blank" rel="noopener">🔗 ${esc(path)}</a>`;
+  }
+  // Local / UNC path — show as copyable chip
+  const icon = path.startsWith('\\\\') ? '🌐' : '📁';
+  const escaped = path.replace(/'/g,"\\'");
+  return `<span class="path-chip"><span class="path-text">${icon} ${esc(path)}</span><button class="copy-path" onclick="copyPath(this,'${escaped}')">Copy</button></span>`;
 }
 
-function saveNotes() {
-  try {
-    localStorage.setItem('apmp_notes', JSON.stringify(notes));
-    const s = document.getElementById('notes-status');
-    s.textContent = 'Saved ✓';
-    setTimeout(() => s.textContent = 'Notes auto-saved in browser.', 2000);
-  } catch(e){}
-}
-
-function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ══════════════════════════════════════════
+// ══════════════════════════════
 // RENDER PAGE
-// ══════════════════════════════════════════
-function renderPage() {
-  const h = DATA.hero;
-  document.getElementById('pg-ship-tag').textContent = h.shipTag;
-  document.getElementById('pg-title').textContent    = h.title;
-  document.getElementById('pg-subtitle').textContent = h.subtitle;
-  document.getElementById('pg-badge-ship').textContent = h.badgeShip;
-  document.getElementById('pg-badge-role').textContent = h.badgeRole;
-  document.getElementById('pg-badge-dept').textContent = h.badgeDept;
-  document.getElementById('pg-footer').textContent   = h.footer;
-  document.title = h.title + ' — ' + h.badgeShip;
+// ══════════════════════════════
+function renderPage(){
+  const h=DATA.hero;
+  document.getElementById('pg-ship-tag').textContent=h.shipTag;
+  document.getElementById('pg-title').textContent=h.title;
+  document.getElementById('pg-subtitle').textContent=h.subtitle;
+  document.getElementById('pg-badge-ship').textContent=h.badgeShip;
+  document.getElementById('pg-badge-role').textContent=h.badgeRole;
+  document.getElementById('pg-badge-dept').textContent=h.badgeDept;
+  document.getElementById('pg-footer').textContent=h.footer;
+  document.title=h.title+' — '+h.badgeShip;
 
   // Credentials
-  const cg = document.getElementById('pg-creds');
-  cg.innerHTML = DATA.creds.map(c => `
+  document.getElementById('pg-creds').innerHTML=DATA.creds.map(c=>`
     <div class="cred-item">
       <div class="cred-service">${esc(c.service)}</div>
-      ${c.user ? `<div class="cred-row"><span class="cred-label">Username</span><span class="cred-val">${esc(c.user)}</span></div>` : ''}
-      ${c.pass ? `<div class="cred-row"><span class="cred-label">Password</span><span class="cred-val">${esc(c.pass)}</span></div>` : ''}
-      ${c.note ? `<div class="cred-note">${esc(c.note)}</div>` : ''}
+      ${c.user?`<div class="cred-row"><span class="cred-label">Username</span><span class="cred-val">${esc(c.user)}</span></div>`:''}
+      ${c.pass?`<div class="cred-row"><span class="cred-label">Password</span><span class="cred-val">${esc(c.pass)}</span></div>`:''}
+      ${c.note?`<div class="cred-note">${esc(c.note)}</div>`:''}
     </div>`).join('');
 
   // Phones
-  document.getElementById('pg-phones').innerHTML = DATA.phones.map(p => `
+  document.getElementById('pg-phones').innerHTML=DATA.phones.map(p=>`
     <div class="phone-item${p.urgent?' urgent':''}">
       <span class="phone-num">${esc(p.num)}</span>
       <div class="phone-info">
         <div class="phone-name">${esc(p.name)}</div>
-        ${p.note ? `<div class="phone-note">${esc(p.note)}</div>` : ''}
+        ${p.note?`<div class="phone-note">${esc(p.note)}</div>`:''}
       </div>
     </div>`).join('');
 
   // Tasks
-  ['daily','weekly','monthly'].forEach(type => {
-    document.getElementById('pg-tasks-'+type).innerHTML =
-      DATA.tasks[type].map(t => `
-        <div class="task-item">
-          <h4>${esc(t.title)}</h4>
-          ${t.desc ? `<p>${esc(t.desc)}</p>` : ''}
-          ${t.path ? `<a class="path" href="${esc(t.pathUrl)}" target="_blank">📁 ${esc(t.path)}</a>` : ''}
-        </div>`).join('');
+  ['daily','weekly','monthly'].forEach(type=>{
+    document.getElementById('pg-tasks-'+type).innerHTML=DATA.tasks[type].map(t=>`
+      <div class="task-item">
+        <h4>${esc(t.title)}</h4>
+        ${t.desc?`<p>${esc(t.desc)}</p>`:''}
+        ${renderPath(t.path)}
+      </div>`).join('');
   });
 
   // Hardware
-  document.getElementById('pg-hw').innerHTML = DATA.hw.map(h => `
+  document.getElementById('pg-hw').innerHTML=DATA.hw.map(h=>`
     <div class="hw-item">
-      <div class="hw-name">${esc(h.name)} ${h.id ? `<span class="hw-id">${esc(h.id)}</span>` : ''}</div>
+      <div class="hw-name">${esc(h.name)}${h.id?` <span class="hw-id">${esc(h.id)}</span>`:''}</div>
       <div class="hw-detail">${esc(h.detail)}</div>
     </div>`).join('');
 
-  // YubiKey
-  document.getElementById('pg-yubi-sn').textContent   = DATA.yubi.sn;
-  document.getElementById('pg-yubi-acct').textContent = DATA.yubi.acct;
-  document.getElementById('pg-yubi-name').textContent = DATA.yubi.name;
+  // Yubikey
+  document.getElementById('pg-yubi-sn').textContent=DATA.yubi.sn;
+  document.getElementById('pg-yubi-acct').textContent=DATA.yubi.acct;
+  document.getElementById('pg-yubi-name').textContent=DATA.yubi.name;
 
   // Checklist
-  document.getElementById('pg-checklist').innerHTML = DATA.checklist.map((c,i) => `
+  document.getElementById('pg-checklist').innerHTML=DATA.checklist.map((c,i)=>`
     <div class="check-item">
       <input type="checkbox" id="chk${i}">
       <label for="chk${i}">
-        <strong>${esc(c.title)}</strong>${c.loc ? ` — ${esc(c.loc)}` : ''}
-        ${c.note ? `<span class="loc">${esc(c.note)}</span>` : ''}
+        <strong>${esc(c.title)}</strong>${c.loc?' — '+esc(c.loc):''}
+        ${c.note?`<span class="loc">${esc(c.note)}</span>`:''}
       </label>
     </div>`).join('');
 
   renderNotes();
 }
 
-// ══════════════════════════════════════════
-// NOTES (Additional Info)
-// ══════════════════════════════════════════
-function renderNotes() {
-  const container = document.getElementById('notes-container');
-  container.querySelectorAll('.extra-entry').forEach(e => e.remove());
-  document.getElementById('notes-empty').style.display = notes.length ? 'none' : '';
-  notes.forEach((note, idx) => {
-    const div = document.createElement('div');
-    div.className = 'extra-entry';
-    div.innerHTML = `
+// ══════════════════════════════
+// NOTES
+// ══════════════════════════════
+function renderNotes(){
+  const container=document.getElementById('notes-container');
+  container.querySelectorAll('.extra-entry').forEach(e=>e.remove());
+  document.getElementById('notes-empty').style.display=notes.length?'none':'';
+  notes.forEach((note,idx)=>{
+    const div=document.createElement('div'); div.className='extra-entry';
+    div.innerHTML=`
       <div class="extra-entry-head">
         <input class="entry-title-input" type="text" placeholder="Note title…" value="${esc(note.title)}" oninput="notes[${idx}].title=this.value;saveNotes()">
         <button class="btn-remove" onclick="notes.splice(${idx},1);renderNotes();saveNotes()">✕</button>
@@ -704,106 +682,78 @@ function renderNotes() {
     container.appendChild(div);
   });
 }
-
-function addNote() {
-  notes.push({title:'',body:''});
-  renderNotes(); saveNotes();
-  setTimeout(() => {
-    const inputs = document.querySelectorAll('.entry-title-input');
-    if(inputs.length) inputs[inputs.length-1].focus();
-  }, 50);
-}
-
-function exportNotes() {
+function addNote(){ notes.push({title:'',body:''}); renderNotes(); saveNotes(); setTimeout(()=>{ const i=document.querySelectorAll('.entry-title-input'); if(i.length) i[i.length-1].focus(); },50); }
+function exportNotes(){
   if(!notes.length){alert('No notes to export.');return;}
-  let t = 'APMP HANDOVER — ADDITIONAL NOTES\n' + '='.repeat(40) + '\n\n';
-  notes.forEach((n,i) => { t += `[${i+1}] ${n.title||'(Untitled)'}\n` + '-'.repeat(30) + '\n' + (n.body||'') + '\n\n'; });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([t],{type:'text/plain'}));
-  a.download = 'APMP_Additional_Notes.txt';
-  a.click();
+  let t='APMP HANDOVER — ADDITIONAL NOTES\n'+'='.repeat(40)+'\n\n';
+  notes.forEach((n,i)=>{ t+=`[${i+1}] ${n.title||'(Untitled)'}\n`+'-'.repeat(30)+'\n'+(n.body||'')+'\n\n'; });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([t],{type:'text/plain'}));
+  a.download='APMP_Additional_Notes.txt'; a.click();
 }
 
-// ══════════════════════════════════════════
-// SETTINGS PANEL
-// ══════════════════════════════════════════
-let currentTab = 'hero';
+// ══════════════════════════════
+// PDF
+// ══════════════════════════════
+function openPdfModal(){ document.getElementById('pdfModal').classList.add('open'); }
+function closePdfModal(){ document.getElementById('pdfModal').classList.remove('open'); }
+function doPrint(){ closePdfModal(); setTimeout(()=>window.print(), 300); }
 
-function openSettings() {
-  pendingData = deepClone(DATA);
+// ══════════════════════════════
+// SETTINGS
+// ══════════════════════════════
+function openSettings(){
+  pendingData=deepClone(DATA);
   populateSettings();
   document.getElementById('settingsOverlay').classList.add('open');
   document.getElementById('settingsDrawer').classList.add('open');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-
-function closeSettings() {
+function closeSettings(){
   document.getElementById('settingsOverlay').classList.remove('open');
   document.getElementById('settingsDrawer').classList.remove('open');
-  document.body.style.overflow = '';
+  document.body.style.overflow='';
 }
-
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.stab').forEach((b,i) => {
-    const tabs = ['hero','creds','phones','tasks','hardware','checklist'];
-    b.classList.toggle('active', tabs[i] === tab);
-  });
-  document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+function switchTab(tab){
+  const tabs=['hero','creds','phones','tasks','hardware','checklist'];
+  document.querySelectorAll('.stab').forEach((b,i)=>b.classList.toggle('active',tabs[i]===tab));
+  document.querySelectorAll('.settings-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('sp-'+tab).classList.add('active');
 }
-
-function populateSettings() {
-  const h = pendingData.hero;
-  document.getElementById('s-ship-tag').value  = h.shipTag;
-  document.getElementById('s-title').value     = h.title;
-  document.getElementById('s-subtitle').value  = h.subtitle;
-  document.getElementById('s-badge-ship').value= h.badgeShip;
-  document.getElementById('s-badge-role').value= h.badgeRole;
-  document.getElementById('s-badge-dept').value= h.badgeDept;
-  document.getElementById('s-footer').value    = h.footer;
-
-  renderCredsList();
-  renderPhonesList();
-  renderTasksList('daily');
-  renderTasksList('weekly');
-  renderTasksList('monthly');
-  renderHWList();
-  renderChecklistList();
-
-  document.getElementById('s-yubi-sn').value   = pendingData.yubi.sn;
-  document.getElementById('s-yubi-acct').value = pendingData.yubi.acct;
-  document.getElementById('s-yubi-name').value = pendingData.yubi.name;
+function populateSettings(){
+  const h=pendingData.hero;
+  document.getElementById('s-ship-tag').value=h.shipTag;
+  document.getElementById('s-title').value=h.title;
+  document.getElementById('s-subtitle').value=h.subtitle;
+  document.getElementById('s-badge-ship').value=h.badgeShip;
+  document.getElementById('s-badge-role').value=h.badgeRole;
+  document.getElementById('s-badge-dept').value=h.badgeDept;
+  document.getElementById('s-footer').value=h.footer;
+  document.getElementById('s-yubi-sn').value=pendingData.yubi.sn;
+  document.getElementById('s-yubi-acct').value=pendingData.yubi.acct;
+  document.getElementById('s-yubi-name').value=pendingData.yubi.name;
+  renderCredsList(); renderPhonesList();
+  renderTasksList('daily'); renderTasksList('weekly'); renderTasksList('monthly');
+  renderHWList(); renderChecklistList();
 }
 
-// ─── Credentials ───
-function renderCredsList() {
-  document.getElementById('creds-list').innerHTML = pendingData.creds.map((c,i) => `
+function renderCredsList(){
+  document.getElementById('creds-list').innerHTML=pendingData.creds.map((c,i)=>`
     <div class="s-card">
       <div class="s-card-title">Credential ${i+1}</div>
       <button class="s-del" onclick="pendingData.creds.splice(${i},1);renderCredsList()">✕</button>
-      <div class="s-row">
-        <div class="s-field"><label>Service Name</label><input class="s-input" value="${esc(c.service)}" oninput="pendingData.creds[${i}].service=this.value"></div>
-      </div>
+      <div class="s-row"><div class="s-field"><label>Service Name</label><input class="s-input" value="${esc(c.service)}" oninput="pendingData.creds[${i}].service=this.value"></div></div>
       <div class="s-row">
         <div class="s-field"><label>Username</label><input class="s-input mono" value="${esc(c.user)}" placeholder="(none)" oninput="pendingData.creds[${i}].user=this.value"></div>
         <div class="s-field"><label>Password</label><input class="s-input mono" value="${esc(c.pass)}" placeholder="(none)" oninput="pendingData.creds[${i}].pass=this.value"></div>
       </div>
-      <div class="s-row">
-        <div class="s-field"><label>Note</label><input class="s-input" value="${esc(c.note)}" placeholder="Optional note" oninput="pendingData.creds[${i}].note=this.value"></div>
-      </div>
+      <div class="s-row"><div class="s-field"><label>Note</label><input class="s-input" value="${esc(c.note)}" placeholder="Optional" oninput="pendingData.creds[${i}].note=this.value"></div></div>
     </div>`).join('');
 }
+function addCred(){ pendingData.creds.push({service:'New Service',user:'',pass:'',note:''}); renderCredsList(); document.getElementById('creds-list').lastElementChild.scrollIntoView({behavior:'smooth'}); }
 
-function addCred() {
-  pendingData.creds.push({service:'New Service',user:'',pass:'',note:''});
-  renderCredsList();
-  document.getElementById('creds-list').lastElementChild.scrollIntoView({behavior:'smooth'});
-}
-
-// ─── Phones ───
-function renderPhonesList() {
-  document.getElementById('phones-list').innerHTML = pendingData.phones.map((p,i) => `
+function renderPhonesList(){
+  document.getElementById('phones-list').innerHTML=pendingData.phones.map((p,i)=>`
     <div class="s-card">
       <div class="s-card-title">Contact ${i+1}</div>
       <button class="s-del" onclick="pendingData.phones.splice(${i},1);renderPhonesList()">✕</button>
@@ -811,55 +761,29 @@ function renderPhonesList() {
         <div class="s-field"><label>Extension / Number</label><input class="s-input mono" value="${esc(p.num)}" oninput="pendingData.phones[${i}].num=this.value"></div>
         <div class="s-field"><label>Name / Role</label><input class="s-input" value="${esc(p.name)}" oninput="pendingData.phones[${i}].name=this.value"></div>
       </div>
-      <div class="s-row">
-        <div class="s-field"><label>Note / Location</label><input class="s-input" value="${esc(p.note)}" placeholder="Optional" oninput="pendingData.phones[${i}].note=this.value"></div>
-      </div>
-      <div class="s-row">
-        <div class="s-field" style="flex-direction:row;align-items:center;gap:8px;">
-          <input type="checkbox" id="urg${i}" ${p.urgent?'checked':''} onchange="pendingData.phones[${i}].urgent=this.checked" style="width:16px;height:16px;accent-color:var(--teal);">
-          <label for="urg${i}" style="font-size:12px;color:var(--slate);cursor:pointer;">Mark as urgent / highlight</label>
-        </div>
-      </div>
+      <div class="s-row"><div class="s-field"><label>Note / Location</label><input class="s-input" value="${esc(p.note)}" placeholder="Optional" oninput="pendingData.phones[${i}].note=this.value"></div></div>
+      <div class="s-row"><div class="s-field" style="flex-direction:row;align-items:center;gap:8px;">
+        <input type="checkbox" id="urg${i}" ${p.urgent?'checked':''} onchange="pendingData.phones[${i}].urgent=this.checked" style="width:16px;height:16px;accent-color:var(--teal);">
+        <label for="urg${i}" style="font-size:12px;color:var(--slate);cursor:pointer;">Mark as urgent (teal highlight)</label>
+      </div></div>
     </div>`).join('');
 }
+function addPhone(){ pendingData.phones.push({num:'',name:'',note:'',urgent:false}); renderPhonesList(); document.getElementById('phones-list').lastElementChild.scrollIntoView({behavior:'smooth'}); }
 
-function addPhone() {
-  pendingData.phones.push({num:'',name:'',note:'',urgent:false});
-  renderPhonesList();
-  document.getElementById('phones-list').lastElementChild.scrollIntoView({behavior:'smooth'});
+function renderTasksList(type){
+  document.getElementById('tasks-'+type+'-list').innerHTML=pendingData.tasks[type].map((t,i)=>`
+    <div class="s-card">
+      <div class="s-card-title">Task ${i+1}</div>
+      <button class="s-del" onclick="pendingData.tasks['${type}'].splice(${i},1);renderTasksList('${type}')">✕</button>
+      <div class="s-row"><div class="s-field"><label>Task Title</label><input class="s-input" value="${esc(t.title)}" oninput="pendingData.tasks['${type}'][${i}].title=this.value"></div></div>
+      <div class="s-row"><div class="s-field"><label>Description</label><textarea class="s-input s-textarea" oninput="pendingData.tasks['${type}'][${i}].desc=this.value">${esc(t.desc)}</textarea></div></div>
+      <div class="s-row"><div class="s-field"><label>Path / URL</label><input class="s-input mono" value="${esc(t.path)}" placeholder="Z:\\folder\\path  or  https://..." oninput="pendingData.tasks['${type}'][${i}].path=this.value"></div></div>
+    </div>`).join('');
 }
+function addTask(type){ pendingData.tasks[type].push({title:'New Task',desc:'',path:''}); renderTasksList(type); document.getElementById('tasks-'+type+'-list').lastElementChild.scrollIntoView({behavior:'smooth'}); }
 
-// ─── Tasks ───
-function renderTasksList(type) {
-  document.getElementById('tasks-'+type+'-list').innerHTML =
-    pendingData.tasks[type].map((t,i) => `
-      <div class="s-card">
-        <div class="s-card-title">Task ${i+1}</div>
-        <button class="s-del" onclick="pendingData.tasks['${type}'].splice(${i},1);renderTasksList('${type}')">✕</button>
-        <div class="s-row">
-          <div class="s-field"><label>Task Title</label><input class="s-input" value="${esc(t.title)}" oninput="pendingData.tasks['${type}'][${i}].title=this.value"></div>
-        </div>
-        <div class="s-row">
-          <div class="s-field"><label>Description</label><textarea class="s-input s-textarea" oninput="pendingData.tasks['${type}'][${i}].desc=this.value">${esc(t.desc)}</textarea></div>
-        </div>
-        <div class="s-row">
-          <div class="s-field"><label>Path / Link Label (displayed)</label><input class="s-input mono" value="${esc(t.path)}" placeholder="Z:\\folder\\path or https://..." oninput="pendingData.tasks['${type}'][${i}].path=this.value"></div>
-        </div>
-        <div class="s-row">
-          <div class="s-field"><label>Path URL (clickable href)</label><input class="s-input mono" value="${esc(t.pathUrl)}" placeholder="file:///Z:/folder/path or https://..." oninput="pendingData.tasks['${type}'][${i}].pathUrl=this.value"></div>
-        </div>
-      </div>`).join('');
-}
-
-function addTask(type) {
-  pendingData.tasks[type].push({title:'New Task',desc:'',path:'',pathUrl:''});
-  renderTasksList(type);
-  document.getElementById('tasks-'+type+'-list').lastElementChild.scrollIntoView({behavior:'smooth'});
-}
-
-// ─── Hardware ───
-function renderHWList() {
-  document.getElementById('hw-list').innerHTML = pendingData.hw.map((h,i) => `
+function renderHWList(){
+  document.getElementById('hw-list').innerHTML=pendingData.hw.map((h,i)=>`
     <div class="s-card">
       <div class="s-card-title">Device ${i+1}</div>
       <button class="s-del" onclick="pendingData.hw.splice(${i},1);renderHWList()">✕</button>
@@ -867,21 +791,13 @@ function renderHWList() {
         <div class="s-field"><label>Device Name</label><input class="s-input" value="${esc(h.name)}" oninput="pendingData.hw[${i}].name=this.value"></div>
         <div class="s-field"><label>Asset ID / Serial</label><input class="s-input mono" value="${esc(h.id)}" placeholder="(optional)" oninput="pendingData.hw[${i}].id=this.value"></div>
       </div>
-      <div class="s-row">
-        <div class="s-field"><label>Details / Notes</label><input class="s-input" value="${esc(h.detail)}" oninput="pendingData.hw[${i}].detail=this.value"></div>
-      </div>
+      <div class="s-row"><div class="s-field"><label>Details / Notes</label><input class="s-input" value="${esc(h.detail)}" oninput="pendingData.hw[${i}].detail=this.value"></div></div>
     </div>`).join('');
 }
+function addHW(){ pendingData.hw.push({name:'New Device',id:'',detail:''}); renderHWList(); document.getElementById('hw-list').lastElementChild.scrollIntoView({behavior:'smooth'}); }
 
-function addHW() {
-  pendingData.hw.push({name:'New Device',id:'',detail:''});
-  renderHWList();
-  document.getElementById('hw-list').lastElementChild.scrollIntoView({behavior:'smooth'});
-}
-
-// ─── Checklist ───
-function renderChecklistList() {
-  document.getElementById('checklist-list').innerHTML = pendingData.checklist.map((c,i) => `
+function renderChecklistList(){
+  document.getElementById('checklist-list').innerHTML=pendingData.checklist.map((c,i)=>`
     <div class="s-card">
       <div class="s-card-title">Item ${i+1}</div>
       <button class="s-del" onclick="pendingData.checklist.splice(${i},1);renderChecklistList()">✕</button>
@@ -889,83 +805,46 @@ function renderChecklistList() {
         <div class="s-field"><label>Item Title</label><input class="s-input" value="${esc(c.title)}" oninput="pendingData.checklist[${i}].title=this.value"></div>
         <div class="s-field"><label>Location</label><input class="s-input" value="${esc(c.loc)}" placeholder="e.g. Deck 8" oninput="pendingData.checklist[${i}].loc=this.value"></div>
       </div>
-      <div class="s-row">
-        <div class="s-field"><label>Instructions / Note</label><textarea class="s-input s-textarea" oninput="pendingData.checklist[${i}].note=this.value">${esc(c.note)}</textarea></div>
-      </div>
+      <div class="s-row"><div class="s-field"><label>Instructions / Note</label><textarea class="s-input s-textarea" oninput="pendingData.checklist[${i}].note=this.value">${esc(c.note)}</textarea></div></div>
     </div>`).join('');
 }
+function addCheckItem(){ pendingData.checklist.push({title:'New Item',loc:'',note:''}); renderChecklistList(); document.getElementById('checklist-list').lastElementChild.scrollIntoView({behavior:'smooth'}); }
 
-function addCheckItem() {
-  pendingData.checklist.push({title:'New Item',loc:'',note:''});
-  renderChecklistList();
-  document.getElementById('checklist-list').lastElementChild.scrollIntoView({behavior:'smooth'});
+function applySettings(){
+  pendingData.hero.shipTag  =document.getElementById('s-ship-tag').value;
+  pendingData.hero.title    =document.getElementById('s-title').value;
+  pendingData.hero.subtitle =document.getElementById('s-subtitle').value;
+  pendingData.hero.badgeShip=document.getElementById('s-badge-ship').value;
+  pendingData.hero.badgeRole=document.getElementById('s-badge-role').value;
+  pendingData.hero.badgeDept=document.getElementById('s-badge-dept').value;
+  pendingData.hero.footer   =document.getElementById('s-footer').value;
+  pendingData.yubi.sn       =document.getElementById('s-yubi-sn').value;
+  pendingData.yubi.acct     =document.getElementById('s-yubi-acct').value;
+  pendingData.yubi.name     =document.getElementById('s-yubi-name').value;
+  DATA=deepClone(pendingData); saveData(); renderPage(); closeSettings();
+  const s=document.getElementById('apply-status');
+  s.textContent='Saved ✓'; setTimeout(()=>s.textContent='',2500);
+}
+function resetSettings(){
+  if(!confirm('Reset everything to original defaults? This cannot be undone.')) return;
+  DATA=deepClone(DEFAULTS); saveData(); renderPage(); closeSettings();
 }
 
-// ─── Apply Settings ───
-function applySettings() {
-  // Read hero fields
-  pendingData.hero.shipTag   = document.getElementById('s-ship-tag').value;
-  pendingData.hero.title     = document.getElementById('s-title').value;
-  pendingData.hero.subtitle  = document.getElementById('s-subtitle').value;
-  pendingData.hero.badgeShip = document.getElementById('s-badge-ship').value;
-  pendingData.hero.badgeRole = document.getElementById('s-badge-role').value;
-  pendingData.hero.badgeDept = document.getElementById('s-badge-dept').value;
-  pendingData.hero.footer    = document.getElementById('s-footer').value;
-  pendingData.yubi.sn        = document.getElementById('s-yubi-sn').value;
-  pendingData.yubi.acct      = document.getElementById('s-yubi-acct').value;
-  pendingData.yubi.name      = document.getElementById('s-yubi-name').value;
-
-  DATA = deepClone(pendingData);
-  saveData();
-  renderPage();
-  closeSettings();
-
-  const s = document.getElementById('apply-status');
-  s.textContent = 'Saved ✓';
-  setTimeout(() => s.textContent = '', 2500);
-}
-
-function resetSettings() {
-  if(!confirm('Reset everything to the original default data? This cannot be undone.')) return;
-  DATA = deepClone(DEFAULTS);
-  saveData();
-  renderPage();
-  closeSettings();
-}
-
-// ══════════════════════════════════════════
+// ══════════════════════════════
 // NAV
-// ══════════════════════════════════════════
-const navSections = ['credentials','phones','lab','hardware','checklist','extra'];
-const navBtns = document.querySelectorAll('.toc-btn');
-
-function scrollToSection(id) {
-  document.getElementById(id).scrollIntoView({behavior:'smooth'});
-}
-
-window.addEventListener('scroll', () => {
-  let current = navSections[0];
-  navSections.forEach(id => {
-    const el = document.getElementById(id);
-    if(el && el.getBoundingClientRect().top <= 80) current = id;
-  });
-  navBtns.forEach((b,i) => b.classList.toggle('active', navSections[i] === current));
+// ══════════════════════════════
+const navSections=['credentials','phones','lab','hardware','checklist','extra'];
+const navBtns=document.querySelectorAll('.toc-btn');
+function scrollToSection(id){ document.getElementById(id).scrollIntoView({behavior:'smooth'}); }
+window.addEventListener('scroll',()=>{
+  let cur=navSections[0];
+  navSections.forEach(id=>{ const el=document.getElementById(id); if(el&&el.getBoundingClientRect().top<=80) cur=id; });
+  navBtns.forEach((b,i)=>b.classList.toggle('active',navSections[i]===cur));
 });
 
-// ══════════════════════════════════════════
-// DOWNLOAD
-// ══════════════════════════════════════════
-function downloadPage() {
-  const html = document.documentElement.outerHTML;
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));
-  a.download = 'HANDOVER_NOTES_APMP.html';
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-}
-
-// ══════════════════════════════════════════
+// ══════════════════════════════
 // INIT
-// ══════════════════════════════════════════
+// ══════════════════════════════
 loadData();
 renderPage();
 </script>
