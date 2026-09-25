@@ -37,16 +37,48 @@ body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;}
 .btn-hero-settings{background:#fff;color:var(--navy);}
 .btn-hero-settings:hover{background:#e8f4fa;}
 
-/* NAV */
-.toc{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50;box-shadow:0 1px 8px rgba(10,22,40,.06);}
+/* NAV — use position:fixed so it never freezes on local file:// */
+.toc{background:#fff;border-bottom:1px solid var(--border);position:fixed;top:0;left:0;right:0;z-index:50;box-shadow:0 1px 8px rgba(10,22,40,.06);}
 .toc-inner{max-width:860px;margin:0 auto;display:flex;overflow-x:auto;scrollbar-width:none;}
 .toc-inner::-webkit-scrollbar{display:none;}
 .toc-btn{background:none;border:none;cursor:pointer;padding:14px 18px;font-size:13px;font-weight:500;color:var(--slate);border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s;font-family:'Inter',sans-serif;}
 .toc-btn:hover{color:var(--teal);}
 .toc-btn.active{color:var(--ocean);border-bottom-color:var(--teal);}
-
-/* LAYOUT */
+.toc-divider{width:1px;background:var(--border);margin:8px 4px;flex-shrink:0;}
+.toc-icon-btn{padding:10px 14px;font-size:17px;border-bottom:2px solid transparent !important;opacity:.75;}
+.toc-icon-btn:hover{opacity:1;background:var(--sky);border-radius:6px;}
+/* Push content down so fixed nav doesn't overlap hero */
 .main{max-width:860px;margin:0 auto;padding:32px 20px 64px;}
+.hero{padding-top:56px;padding-bottom:48px;}
+body > header.hero{margin-top:49px;}
+
+/* PHOTO THUMBNAIL + HOVER PREVIEW */
+.task-photo-wrap{position:relative;display:inline-block;}
+.task-photo-wrap img{width:72px;height:72px;object-fit:cover;border-radius:6px;border:1px solid var(--border);display:block;cursor:zoom-in;transition:transform .1s;}
+.task-photo-wrap img:hover{transform:scale(1.05);}
+.task-photo-wrap .photo-preview{
+  display:none;
+  position:fixed;
+  z-index:500;
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:10px;
+  box-shadow:0 8px 32px rgba(10,22,40,.25);
+  padding:4px;
+  pointer-events:none;
+  max-width:360px;
+  max-height:360px;
+}
+.task-photo-wrap .photo-preview img{
+  width:auto;height:auto;
+  max-width:352px;max-height:352px;
+  border-radius:7px;border:none;
+  object-fit:contain;display:block;
+}
+.task-photo-wrap:hover .photo-preview{display:block;}
+.task-photo-del{position:absolute;top:-5px;right:-5px;background:var(--red);border:none;color:#fff;width:16px;height:16px;border-radius:50%;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;}
+.task-item.editing .task-photo-del{display:flex;}
+.chk-del{display:flex!important;}
 .section{margin-bottom:40px;scroll-margin-top:56px;}
 .section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
 .section-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
@@ -78,17 +110,50 @@ body{font-family:'Inter',sans-serif;font-size:15px;line-height:1.65;}
 .phone-note{font-size:12px;color:var(--slate);margin-top:2px;line-height:1.4;}
 
 /* PRIORITY */
-.priority-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:4px;margin-bottom:10px;}
-.priority-urgent{background:#FEE2E2;color:var(--red);}
-.priority-weekly{background:#FEF9C3;color:var(--amber);}
-.priority-monthly{background:#DCFCE7;color:var(--green);}
+.priority-tag{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px;border-radius:8px;margin-bottom:12px;border-left:5px solid;}
+.priority-urgent{background:#FEE2E2;color:#991B1B;border-left-color:#DC2626;}
+.priority-urgent::before{content:'🔴';font-size:14px;}
+.priority-weekly{background:#FEF3C7;color:#92400E;border-left-color:#D97706;}
+.priority-weekly::before{content:'🟡';font-size:14px;}
+.priority-monthly{background:#D1FAE5;color:#065F46;border-left-color:#059669;}
+.priority-monthly::before{content:'🟢';font-size:14px;}
 
-/* TASKS */
-.task-group{margin-bottom:20px;}
+/* DROP ZONE label on group when dragging */
+.task-group{margin-bottom:20px;border-radius:8px;transition:background .15s;}
+.task-group.drop-target{background:rgba(11,126,168,.05);outline:2px dashed var(--teal);outline-offset:4px;}
+.task-group-label{font-size:11px;color:var(--slate);text-align:center;padding:6px;display:none;font-style:italic;}
+body.is-dragging .task-group-label{display:block;}
+body.is-dragging .task-item:not(.dragging){cursor:copy;}
 .task-list{display:flex;flex-direction:column;gap:8px;}
-.task-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px 14px;}
-.task-item h4{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;}
-.task-item p{font-size:13px;color:var(--slate);line-height:1.5;}
+.task-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:0;position:relative;transition:box-shadow .15s,border-color .15s;}
+.task-item.dragging{opacity:.4;border-style:dashed;}
+.task-item.drag-over{border-color:var(--teal);box-shadow:0 0 0 2px rgba(11,126,168,.2);}
+.task-item-bar{display:flex;align-items:center;gap:0;border-bottom:1px solid transparent;}
+.task-item.has-content .task-item-bar{border-bottom-color:var(--border);}
+.drag-handle{display:flex;align-items:center;justify-content:center;width:32px;flex-shrink:0;cursor:grab;color:#CBD5E0;font-size:14px;padding:12px 0 12px 12px;user-select:none;}
+.drag-handle:active{cursor:grabbing;}
+.drag-handle:hover{color:var(--teal);}
+.task-title-wrap{flex:1;padding:10px 6px 10px 4px;}
+.task-title-view{font-size:13px;font-weight:600;color:var(--navy);line-height:1.4;}
+.task-title-input{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:var(--navy);background:var(--sky);border:1px solid var(--teal);border-radius:4px;padding:3px 6px;width:100%;outline:none;display:none;}
+.task-edit-btn{background:none;border:none;cursor:pointer;color:#CBD5E0;font-size:13px;padding:10px 12px 10px 4px;flex-shrink:0;transition:color .1s;line-height:1;}
+.task-edit-btn:hover{color:var(--teal);}
+.task-item.editing .task-edit-btn{color:var(--teal);}
+.task-body{padding:8px 14px 12px 48px;}
+.task-body.no-content{padding-top:0;}
+.task-desc-view{font-size:13px;color:var(--slate);line-height:1.5;}
+.task-desc-input{font-family:'Inter',sans-serif;font-size:13px;color:var(--navy);background:var(--sky);border:1px solid var(--teal);border-radius:4px;padding:5px 8px;width:100%;outline:none;resize:none;min-height:80px;line-height:1.6;display:none;overflow:hidden;}
+.task-edit-actions{display:none;gap:6px;margin-top:8px;align-items:center;flex-wrap:wrap;}
+.task-item.editing .task-edit-actions{display:flex;}
+.btn-task-save{background:var(--teal);border:none;color:#fff;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:5px 14px;border-radius:4px;cursor:pointer;}
+.btn-task-save:hover{background:var(--ocean);}
+.btn-task-cancel{background:none;border:1px solid var(--border);color:var(--slate);font-family:'Inter',sans-serif;font-size:11px;padding:5px 10px;border-radius:4px;cursor:pointer;}
+.btn-task-cancel:hover{background:var(--mist);}
+/* Photo attachment */
+.btn-attach{background:none;border:1px dashed var(--border);color:var(--slate);font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:4px;cursor:pointer;transition:border-color .1s,color .1s;margin-left:auto;}
+.btn-attach:hover{border-color:var(--teal);color:var(--teal);}
+.task-photo-input{display:none;}
+.task-photos{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
 
 /* PATH — copyable chip, no broken link */
 .path-chip{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--mist);border:1px solid var(--border);border-radius:4px;padding:3px 6px 3px 8px;color:var(--ocean);margin-top:5px;max-width:100%;}
@@ -114,10 +179,20 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
 
 /* CHECKLIST */
 .checklist{display:flex;flex-direction:column;gap:6px;}
-.check-item{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;}
-.check-item input[type="checkbox"]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--teal);cursor:pointer;}
-.check-item label{font-size:13px;color:var(--navy);cursor:pointer;}
-.check-item label .loc{font-size:11px;color:var(--slate);display:block;margin-top:1px;}
+.check-item{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 14px;transition:background .15s;}
+.check-item.chk-done{background:#F0FBF4;border-color:#A7F3C0;}
+.check-item.chk-done label strong{text-decoration:line-through;color:var(--slate);}
+.check-item input[type="checkbox"]{width:18px;height:18px;margin-top:3px;flex-shrink:0;accent-color:var(--teal);cursor:pointer;}
+.chk-body{flex:1;min-width:0;}
+.chk-body label{font-size:13px;color:var(--navy);cursor:pointer;display:block;}
+.chk-body label .loc{font-size:11px;color:var(--slate);display:block;margin-top:1px;}
+.chk-actions{margin-top:6px;}
+.btn-chk-photo{background:none;border:1px dashed var(--border);color:var(--slate);font-family:'Inter',sans-serif;font-size:11px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:border-color .1s,color .1s;}
+.btn-chk-photo:hover{border-color:var(--teal);color:var(--teal);}
+.chk-photo-input{display:none;}
+.chk-photos{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chk-photos:empty{display:none;}
+.chk-del{display:flex!important;}
 
 /* EXTRA NOTES */
 .extra-section{background:#fff;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
@@ -375,6 +450,9 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
     <button class="toc-btn" onclick="scrollToSection('hardware')">Hardware</button>
     <button class="toc-btn" onclick="scrollToSection('checklist')">Daily Checklist</button>
     <button class="toc-btn" onclick="scrollToSection('extra')">Additional Info</button>
+    <div class="toc-divider"></div>
+    <button class="toc-btn toc-icon-btn" onclick="openSettings()" title="Edit / Settings">⚙️</button>
+    <button class="toc-btn toc-icon-btn" onclick="openPdfModal()" title="Download PDF">📄</button>
   </div>
 </nav>
 
@@ -409,7 +487,7 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
       <div class="card-body" style="font-size:13px;color:var(--slate);">
         All sizes enabled. Tilepix photos → Printer 1. All other sizes → Main 1.<br><br>
         <strong style="color:var(--navy);">Tutorial path:</strong>
-        <span class="path-chip"><span class="path-text">\\aqua.ncl.com\users\photolab422\Documents\Tutorial Video\Darkroom Printing</span><button class="copy-path" onclick="copyPath(this,'\\\\aqua.ncl.com\\users\\photolab422\\Documents\\Tutorial Video\\Darkroom Printing')">Copy</button></span>
+        <span class="path-chip"><span class="path-text">🌐 \\aqua.ncl.com\users\photolab422\Documents\Tutorial Video\Darkroom Printing</span><button class="copy-path" data-path="\\aqua.ncl.com\users\photolab422\Documents\Tutorial Video\Darkroom Printing" onclick="copyPath(this)">Copy</button></span>
       </div>
     </div>
     <div class="hw-grid" id="pg-hw"></div>
@@ -568,20 +646,28 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 // PATH CHIP — copy to clipboard
 // works everywhere (Vercel, local, any host)
 // ══════════════════════════════
-function copyPath(btn, path){
-  navigator.clipboard.writeText(path).then(()=>{
+// ══════════════════════════════
+// PATH COPY — reads from data-path to avoid backslash corruption in onclick
+// ══════════════════════════════
+function copyPath(btn){
+  const path = btn.getAttribute('data-path');
+  const doCopy = () => {
     btn.textContent='✓ Copied'; btn.classList.add('copied');
     setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
-  }).catch(()=>{
-    // fallback for older browsers
-    const ta=document.createElement('textarea');
-    ta.value=path; ta.style.position='fixed'; ta.style.opacity='0';
-    document.body.appendChild(ta); ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent='✓ Copied'; btn.classList.add('copied');
-    setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); }, 2000);
-  });
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(path).then(doCopy).catch(()=>fallbackCopy(btn,path,doCopy));
+  } else {
+    fallbackCopy(btn, path, doCopy);
+  }
+}
+function fallbackCopy(btn, path, cb){
+  const ta=document.createElement('textarea');
+  ta.value=path; ta.style.cssText='position:fixed;opacity:0;top:0;left:0;';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); } catch(e){}
+  document.body.removeChild(ta);
+  cb();
 }
 
 function renderPath(path){
@@ -590,10 +676,9 @@ function renderPath(path){
   if(isHttp){
     return `<a class="path-link" href="${esc(path)}" target="_blank" rel="noopener">🔗 ${esc(path)}</a>`;
   }
-  // Local / UNC path — show as copyable chip
+  // Local / UNC path — store path in data-path attribute, NOT in onclick
   const icon = path.startsWith('\\\\') ? '🌐' : '📁';
-  const escaped = path.replace(/'/g,"\\'");
-  return `<span class="path-chip"><span class="path-text">${icon} ${esc(path)}</span><button class="copy-path" onclick="copyPath(this,'${escaped}')">Copy</button></span>`;
+  return `<span class="path-chip"><span class="path-text">${icon} ${esc(path)}</span><button class="copy-path" data-path="${esc(path)}" onclick="copyPath(this)">Copy</button></span>`;
 }
 
 // ══════════════════════════════
@@ -631,13 +716,42 @@ function renderPage(){
 
   // Tasks
   ['daily','weekly','monthly'].forEach(type=>{
-    document.getElementById('pg-tasks-'+type).innerHTML=DATA.tasks[type].map(t=>`
-      <div class="task-item">
-        <h4>${esc(t.title)}</h4>
-        ${t.desc?`<p>${esc(t.desc)}</p>`:''}
-        ${renderPath(t.path)}
-      </div>`).join('');
+    const list = document.getElementById('pg-tasks-'+type);
+    list.innerHTML = DATA.tasks[type].map((t,i)=>{
+      const hasContent = t.desc || t.path || (t.photos && t.photos.length);
+      const photosHtml = (t.photos && t.photos.length)
+        ? `<div class="task-photos">${t.photos.map((p,pi)=>`
+            <div class="task-photo-wrap">
+              <img src="${p}" alt="Photo ${pi+1}">
+              <div class="photo-preview"><img src="${p}" alt="Preview"></div>
+              <button class="task-photo-del" onclick="deleteTaskPhoto(this,'${type}',${i},${pi})" title="Remove photo">✕</button>
+            </div>`).join('')}</div>` : '<div class="task-photos"></div>';
+      return `<div class="task-item${hasContent?' has-content':''}" draggable="true" data-type="${type}" data-orig-type="${type}" data-idx="${i}">
+        <div class="task-item-bar">
+          <span class="drag-handle" title="Drag to reorder or move to another group">⠿</span>
+          <div class="task-title-wrap">
+            <div class="task-title-view">${esc(t.title)}</div>
+            <input class="task-title-input" type="text" value="${esc(t.title)}">
+          </div>
+          <button class="task-edit-btn" onclick="toggleTaskEdit(this)" title="Edit">✏️</button>
+        </div>
+        <div class="task-body${hasContent?'':' no-content'}">
+          ${t.desc?`<div class="task-desc-view">${esc(t.desc)}</div>`:''}
+          <textarea class="task-desc-input" placeholder="Add description…">${esc(t.desc||'')}</textarea>
+          ${renderPath(t.path)}
+          ${photosHtml}
+          <div class="task-edit-actions">
+            <button class="btn-task-save" onclick="saveTaskEdit(this,'${type}',${i})">✓ Save</button>
+            <button class="btn-task-cancel" onclick="cancelTaskEdit(this)">Cancel</button>
+            <button class="btn-attach" onclick="triggerPhotoUpload(this)" title="Attach photo">📎 Add Photo</button>
+            <input type="file" class="task-photo-input" accept="image/*" multiple onchange="handlePhotoUpload(this,'${type}',${i})">
+          </div>
+        </div>
+      </div>`;
+    }).join('');
   });
+  // Init cross-list drag after all three lists are in the DOM
+  initAllDragDrop();
 
   // Hardware
   document.getElementById('pg-hw').innerHTML=DATA.hw.map(h=>`
@@ -652,14 +766,29 @@ function renderPage(){
   document.getElementById('pg-yubi-name').textContent=DATA.yubi.name;
 
   // Checklist
-  document.getElementById('pg-checklist').innerHTML=DATA.checklist.map((c,i)=>`
-    <div class="check-item">
-      <input type="checkbox" id="chk${i}">
-      <label for="chk${i}">
-        <strong>${esc(c.title)}</strong>${c.loc?' — '+esc(c.loc):''}
-        ${c.note?`<span class="loc">${esc(c.note)}</span>`:''}
-      </label>
-    </div>`).join('');
+  document.getElementById('pg-checklist').innerHTML=DATA.checklist.map((c,i)=>{
+    const photosHtml = (c.photos && c.photos.length)
+      ? `<div class="chk-photos">${c.photos.map((p,pi)=>`
+          <div class="task-photo-wrap">
+            <img src="${p}" alt="Photo ${pi+1}">
+            <div class="photo-preview"><img src="${p}" alt="Preview"></div>
+            <button class="task-photo-del chk-del" onclick="deleteChkPhoto(${i},${pi})" title="Remove">✕</button>
+          </div>`).join('')}</div>` : `<div class="chk-photos"></div>`;
+    return `<div class="check-item" id="chk-item-${i}">
+      <input type="checkbox" id="chk${i}" onchange="this.closest('.check-item').classList.toggle('chk-done',this.checked)">
+      <div class="chk-body">
+        <label for="chk${i}">
+          <strong>${esc(c.title)}</strong>${c.loc?' — '+esc(c.loc):''}
+          ${c.note?`<span class="loc">${esc(c.note)}</span>`:''}
+        </label>
+        ${photosHtml}
+        <div class="chk-actions">
+          <button class="btn-chk-photo" onclick="triggerChkPhoto(${i})" title="Attach photo">📎 Add Photo</button>
+          <input type="file" class="chk-photo-input" id="chk-input-${i}" accept="image/*" multiple onchange="handleChkPhoto(this,${i})">
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 
   renderNotes();
 }
@@ -831,6 +960,21 @@ function resetSettings(){
 }
 
 // ══════════════════════════════
+// PHOTO PREVIEW POSITIONING
+// ══════════════════════════════
+document.addEventListener('mousemove', e => {
+  const preview = document.querySelector('.task-photo-wrap:hover .photo-preview');
+  if(!preview) return;
+  const pw = 360, ph = 360, margin = 14;
+  let x = e.clientX + margin;
+  let y = e.clientY + margin;
+  if(x + pw > window.innerWidth)  x = e.clientX - pw - margin;
+  if(y + ph > window.innerHeight) y = e.clientY - ph - margin;
+  preview.style.left = x + 'px';
+  preview.style.top  = y + 'px';
+});
+
+// ══════════════════════════════
 // NAV
 // ══════════════════════════════
 const navSections=['credentials','phones','lab','hardware','checklist','extra'];
@@ -841,6 +985,318 @@ window.addEventListener('scroll',()=>{
   navSections.forEach(id=>{ const el=document.getElementById(id); if(el&&el.getBoundingClientRect().top<=80) cur=id; });
   navBtns.forEach((b,i)=>b.classList.toggle('active',navSections[i]===cur));
 });
+
+// ══════════════════════════════
+// INLINE TASK EDIT
+// ══════════════════════════════
+function autoExpand(el){
+  el.style.height = 'auto';
+  el.style.height = Math.max(80, el.scrollHeight + 4) + 'px';
+}
+
+function toggleTaskEdit(btn){
+  const item = btn.closest('.task-item');
+  const isEditing = item.classList.contains('editing');
+  if(isEditing){ cancelTaskEdit(item.querySelector('.btn-task-cancel')); return; }
+  item.classList.add('editing','has-content');
+  item.querySelector('.task-item-bar').style.borderBottomColor='var(--border)';
+  // Title
+  item.querySelectorAll('.task-title-view').forEach(el=>el.style.display='none');
+  item.querySelectorAll('.task-title-input').forEach(el=>{ el.style.display='block'; el.focus(); el.select(); });
+  // Desc — hide view, show + expand textarea
+  item.querySelectorAll('.task-desc-view').forEach(el=>el.style.display='none');
+  item.querySelectorAll('.task-desc-input').forEach(el=>{
+    el.style.display='block';
+    autoExpand(el);
+    el.addEventListener('input', ()=>autoExpand(el), {once:false});
+  });
+}
+
+function cancelTaskEdit(btn){
+  const item = btn.closest('.task-item');
+  item.classList.remove('editing');
+  item.querySelectorAll('.task-title-view').forEach(el=>el.style.display='');
+  item.querySelectorAll('.task-title-input').forEach(el=>el.style.display='none');
+  item.querySelectorAll('.task-desc-view').forEach(el=>el.style.display='');
+  item.querySelectorAll('.task-desc-input').forEach(el=>{ el.style.display='none'; el.style.height=''; });
+}
+
+function saveTaskEdit(btn, type, idx){
+  const item = btn.closest('.task-item');
+  const titleInput = item.querySelector('.task-title-input');
+  const descInput  = item.querySelector('.task-desc-input');
+  const newTitle = (titleInput ? titleInput.value.trim() : null) || DATA.tasks[type][idx].title;
+  const newDesc  = descInput  ? descInput.value.trim()  : DATA.tasks[type][idx].desc;
+  DATA.tasks[type][idx].title = newTitle;
+  DATA.tasks[type][idx].desc  = newDesc;
+  saveData();
+  // Update views in place
+  const tv = item.querySelector('.task-title-view');
+  if(tv) tv.textContent = newTitle;
+  const dv = item.querySelector('.task-desc-view');
+  if(dv){ dv.textContent = newDesc; }
+  else if(newDesc){
+    // Create desc view if it didn't exist
+    const dview = document.createElement('div');
+    dview.className='task-desc-view'; dview.textContent=newDesc;
+    item.querySelector('.task-body').prepend(dview);
+  }
+  cancelTaskEdit(btn);
+  item.style.borderColor='var(--green)';
+  setTimeout(()=>item.style.borderColor='',1000);
+}
+
+// ══════════════════════════════
+// PHOTO ATTACHMENT
+// ══════════════════════════════
+function triggerPhotoUpload(btn){
+  btn.closest('.task-edit-actions').querySelector('.task-photo-input').click();
+}
+
+function compressImage(file, maxW, maxH, quality){
+  return new Promise(resolve=>{
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = ()=>{
+      URL.revokeObjectURL(url);
+      let w=img.width, h=img.height;
+      const ratio = Math.min(maxW/w, maxH/h, 1);
+      w = Math.round(w*ratio); h = Math.round(h*ratio);
+      const canvas = document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src=url;
+  });
+}
+
+async function handlePhotoUpload(input, type, idx){
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  if(!DATA.tasks[type][idx].photos) DATA.tasks[type][idx].photos=[];
+
+  const item = input.closest('.task-item');
+  const photosContainer = item.querySelector('.task-photos');
+  const btn = item.querySelector('.btn-attach');
+  btn.textContent='⏳ Compressing…'; btn.disabled=true;
+
+  for(const file of files){
+    // Compress to max 400×400, JPEG 0.55 quality — ~15–30 KB each
+    const dataUrl = await compressImage(file, 400, 400, 0.55);
+    DATA.tasks[type][idx].photos.push(dataUrl);
+    // Add thumb immediately
+    const pi = DATA.tasks[type][idx].photos.length - 1;
+    const wrap = document.createElement('div');
+    wrap.className='task-photo-wrap';
+    wrap.innerHTML=`<img src="${dataUrl}" alt="Photo">
+      <div class="photo-preview"><img src="${dataUrl}" alt="Preview"></div>
+      <button class="task-photo-del" onclick="deleteTaskPhoto(this,'${type}',${idx},${pi})" title="Remove">✕</button>`;
+    wrap.querySelector('.task-photo-del').style.display='flex';
+    photosContainer.appendChild(wrap);
+  }
+
+  saveData();
+  btn.textContent='📎 Add Photo'; btn.disabled=false;
+  input.value='';
+}
+
+function deleteTaskPhoto(btn, type, idx, pi){
+  DATA.tasks[type][idx].photos.splice(pi,1);
+  saveData();
+  const item = btn.closest('.task-item');
+  const container = item.querySelector('.task-photos');
+  container.innerHTML = DATA.tasks[type][idx].photos.map((p,n)=>`
+    <div class="task-photo-wrap">
+      <img src="${p}" alt="Photo ${n+1}">
+      <div class="photo-preview"><img src="${p}" alt="Preview"></div>
+      <button class="task-photo-del" onclick="deleteTaskPhoto(this,'${type}',${idx},${n})" title="Remove" style="display:flex">✕</button>
+    </div>`).join('');
+}
+
+// ── CHECKLIST PHOTOS ──
+function triggerChkPhoto(i){
+  document.getElementById('chk-input-'+i).click();
+}
+
+async function handleChkPhoto(input, i){
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  if(!DATA.checklist[i].photos) DATA.checklist[i].photos = [];
+  const btn = document.querySelector(`#chk-item-${i} .btn-chk-photo`);
+  btn.textContent = '⏳ Compressing…'; btn.disabled = true;
+  const container = document.querySelector(`#chk-item-${i} .chk-photos`);
+  for(const file of files){
+    const dataUrl = await compressImage(file, 400, 400, 0.55);
+    DATA.checklist[i].photos.push(dataUrl);
+    const pi = DATA.checklist[i].photos.length - 1;
+    const wrap = document.createElement('div');
+    wrap.className = 'task-photo-wrap';
+    wrap.innerHTML = `<img src="${dataUrl}" alt="Photo">
+      <div class="photo-preview"><img src="${dataUrl}" alt="Preview"></div>
+      <button class="task-photo-del chk-del" onclick="deleteChkPhoto(${i},${pi})" title="Remove">✕</button>`;
+    container.appendChild(wrap);
+  }
+  saveData();
+  btn.textContent = '📎 Add Photo'; btn.disabled = false;
+  input.value = '';
+}
+
+function deleteChkPhoto(i, pi){
+  DATA.checklist[i].photos.splice(pi, 1);
+  saveData();
+  const container = document.querySelector(`#chk-item-${i} .chk-photos`);
+  container.innerHTML = DATA.checklist[i].photos.map((p,n)=>`
+    <div class="task-photo-wrap">
+      <img src="${p}" alt="Photo ${n+1}">
+      <div class="photo-preview"><img src="${p}" alt="Preview"></div>
+      <button class="task-photo-del chk-del" onclick="deleteChkPhoto(${i},${n})" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+// ══════════════════════════════
+// DRAG & DROP — cross-list
+// ══════════════════════════════
+const TASK_LISTS = ['daily','weekly','monthly'];
+let dragSrc     = null;  // the DOM element being dragged
+let dragSrcType = null;  // which list it came from
+
+function initAllDragDrop(){
+  TASK_LISTS.forEach(type => {
+    const list = document.getElementById('pg-tasks-'+type);
+    // Make the group container a drop target too (for empty lists)
+    const group = list.closest('.task-group');
+    group.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    group.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if(!dragSrc) return;
+      // If dropped on the group (not on an item), append to end of list
+      if(!e.target.closest('.task-item')){
+        list.appendChild(dragSrc);
+        dragSrc.dataset.type = type;
+        commitDrag();
+      }
+    });
+  });
+
+  // Wire each item
+  rewireAllItems();
+}
+
+function rewireAllItems(){
+  document.querySelectorAll('.task-item').forEach(item => {
+    // Remove old listeners by replacing with clone
+    const clone = item.cloneNode(true);
+    item.parentNode.replaceChild(clone, item);
+  });
+
+  document.querySelectorAll('.task-item').forEach(item => {
+    item.addEventListener('dragstart', e => {
+      dragSrc     = item;
+      dragSrcType = item.dataset.type;
+      item.classList.add('dragging');
+      document.body.classList.add('is-dragging');
+      // Highlight all three groups as drop targets
+      TASK_LISTS.forEach(t => {
+        document.getElementById('pg-tasks-'+t).closest('.task-group').classList.add('drop-target');
+      });
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain','task'); // required for Firefox
+    });
+
+    item.addEventListener('dragend', () => {
+      if(dragSrc) dragSrc.classList.remove('dragging');
+      document.body.classList.remove('is-dragging');
+      TASK_LISTS.forEach(t => {
+        document.getElementById('pg-tasks-'+t).closest('.task-group').classList.remove('drop-target');
+      });
+      document.querySelectorAll('.task-item').forEach(i => i.classList.remove('drag-over'));
+    });
+
+    item.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      if(item === dragSrc) return;
+      document.querySelectorAll('.task-item').forEach(i => i.classList.remove('drag-over'));
+      item.classList.add('drag-over');
+      const rect = item.getBoundingClientRect();
+      const mid  = rect.top + rect.height / 2;
+      const list = item.parentNode;
+      if(e.clientY < mid){
+        list.insertBefore(dragSrc, item);
+      } else {
+        list.insertBefore(dragSrc, item.nextSibling);
+      }
+      dragSrc.dataset.type = list.id.replace('pg-tasks-','');
+    });
+
+    item.addEventListener('dragleave', () => item.classList.remove('drag-over'));
+
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      item.classList.remove('drag-over');
+      commitDrag();
+    });
+  });
+}
+
+function commitDrag(){
+  if(!dragSrc) return;
+
+  // Show which group it landed in
+  const destList = dragSrc.parentNode;
+  const destType = destList.id.replace('pg-tasks-','');
+
+  // Rebuild DATA for all 3 lists from DOM order
+  TASK_LISTS.forEach(type => {
+    const list = document.getElementById('pg-tasks-'+type);
+    const newArr = [];
+    list.querySelectorAll('.task-item').forEach(item => {
+      const oldType = item.dataset.origType || item.dataset.type || type;
+      const oldIdx  = parseInt(item.dataset.idx);
+      const srcArr  = DATA.tasks[oldType] || DATA.tasks[type];
+      if(srcArr && srcArr[oldIdx] !== undefined){
+        newArr.push(srcArr[oldIdx]);
+      }
+    });
+    DATA.tasks[type] = newArr;
+  });
+
+  // Now re-index all items and update their type/origType
+  TASK_LISTS.forEach(type => {
+    const list = document.getElementById('pg-tasks-'+type);
+    list.querySelectorAll('.task-item').forEach((item, n) => {
+      item.dataset.type     = type;
+      item.dataset.origType = type;
+      item.dataset.idx      = n;
+    });
+  });
+
+  // Re-wire save buttons across all lists
+  TASK_LISTS.forEach(type => {
+    const list = document.getElementById('pg-tasks-'+type);
+    list.querySelectorAll('.btn-task-save').forEach((btn, n) => {
+      btn.setAttribute('onclick', `saveTaskEdit(this,'${type}',${n})`);
+    });
+  });
+
+  saveData();
+
+  // Flash the moved item green briefly
+  dragSrc.style.borderColor = 'var(--teal)';
+  dragSrc.style.boxShadow   = '0 0 0 2px rgba(11,126,168,.25)';
+  setTimeout(() => {
+    if(dragSrc){ dragSrc.style.borderColor=''; dragSrc.style.boxShadow=''; }
+    dragSrc = null;
+    dragSrcType = null;
+    rewireAllItems(); // re-clone so future drags work cleanly
+  }, 800);
+}
 
 // ══════════════════════════════
 // INIT
