@@ -1304,5 +1304,218 @@ function commitDrag(){
 loadData();
 renderPage();
 </script>
+<style>
+#sh{position:fixed;inset:0;background:rgba(10,22,40,.55);z-index:900;display:none;align-items:center;justify-content:center;padding:16px}
+#sh.open{display:flex}
+#sh .box{background:#fff;border-radius:12px;width:min(480px,100%);max-height:88vh;overflow:auto;padding:20px;box-shadow:0 12px 40px rgba(10,22,40,.3)}
+#sh h3{font-size:17px;margin-bottom:12px;color:var(--navy)}
+#sh .r{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+#sh input[type=text]{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font:14px Inter,sans-serif}
+#sh button{background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 11px;font:600 12px Inter,sans-serif;color:var(--navy);cursor:pointer}
+#sh button.pri,#sh button.act{background:var(--teal);border-color:var(--teal);color:#fff}
+#sh button.del{color:var(--red)}
+#sh .add{border-top:1px solid var(--border);margin-top:14px;padding-top:14px}
+#sh label{display:block;font-size:13px;color:var(--slate);margin:4px 0}
+#sh small{display:block;color:var(--slate);font-size:12px;margin-top:8px}
+</style>
+<script>
+(function(){
+const R='apmp_ships',A='apmp_active',$=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+let ships=[];try{ships=JSON.parse(localStorage.getItem(R)||'[]')}catch(e){}
+if(!ships.length)ships=[{id:'default',name:DATA.hero.badgeShip||'Norwegian Aqua'}];
+let active=localStorage.getItem(A)||ships[0].id;if(!ships.some(s=>s.id===active))active=ships[0].id;
+const persist=()=>{try{localStorage.setItem(R,JSON.stringify(ships));localStorage.setItem(A,active)}catch(e){}};
+const suf=id=>id==='default'?'':':'+id;
+const K=id=>({d:'apmp_data'+suf(id),n:'apmp_notes'+suf(id)});
+const rd=(k,f)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):f}catch(e){return f}};
+const rep=(d,a,b)=>{if(a&&d.hero)for(const k in d.hero)if(typeof d.hero[k]==='string')d.hero[k]=d.hero[k].split(a).join(b);return d};
+const blank=(name,from)=>{
+  let d;
+  if(from){d=deepClone(from);d.creds=[];const strip=o=>{delete o.photos;delete o.files};Object.values(d.tasks).flat().forEach(strip);d.checklist.forEach(strip)}
+  else d=Object.assign(deepClone(DEFAULTS),{creds:[],phones:[],tasks:{daily:[],weekly:[],monthly:[]},hw:[],yubi:{sn:'',acct:'',name:''},checklist:[]});
+  return rep(d,(from||DEFAULTS).hero.badgeShip,name);
+};
+window.loadData=function(){DATA=rd(K(active).d,null)||(active==='default'?deepClone(DEFAULTS):blank(nameOf(active)));notes=rd(K(active).n,[])};
+window.saveData=function(){try{localStorage.setItem(K(active).d,JSON.stringify(DATA))}catch(e){}};
+window.saveNotes=function(){
+  try{localStorage.setItem(K(active).n,JSON.stringify(notes))}catch(e){}
+  const s=document.getElementById('notes-status');s.textContent='Saved ✓';setTimeout(()=>s.textContent='Notes auto-saved in browser.',2000);
+};
+window.resetSettings=function(){
+  if(!confirm('Reset this ship to its starting template? This cannot be undone.'))return;
+  DATA=active==='default'?deepClone(DEFAULTS):blank(nameOf(active));saveData();renderPage();closeSettings();
+};
+const nameOf=id=>(ships.find(s=>s.id===id)||{}).name||'New Ship';
+const btn=el('button','toc-btn toc-icon-btn');btn.title='Manage ships';
+const lab=()=>{btn.textContent='🚢 '+nameOf(active)+' ▾'};
+$('.toc-inner').append(el('div','toc-divider'),btn);
+function open(show){
+  const h=DATA.hero.badgeShip;const s=ships.find(x=>x.id===active);
+  if(h&&s&&s.name!==h){s.name=h;persist();lab()}
+  const bx=$('#sh .box');bx.innerHTML='<h3>🚢 Ships</h3>';
+  ships.forEach(s=>{
+    const r=el('div','r'),i=el('input');i.type='text';i.value=s.name;
+    i.onchange=()=>{const n=i.value.trim();if(!n){i.value=s.name;return}
+      const old=s.name;s.name=n;persist();
+      if(s.id===active){rep(DATA,old,n);DATA.hero.badgeShip=n;saveData();renderPage()}
+      else{const d=rd(K(s.id).d,null);if(d){rep(d,old,n);d.hero.badgeShip=n;localStorage.setItem(K(s.id).d,JSON.stringify(d))}}
+      lab()};
+    const o=el('button',s.id===active?'act':'',s.id===active?'Open ✓':'Open');o.onclick=()=>{sw(s.id);open()};
+    r.append(i,o);
+    if(ships.length>1){const x=el('button','del','Delete');let arm=0;x.onclick=()=>{if(!arm){arm=1;x.textContent='Sure?';setTimeout(()=>{arm=0;x.textContent='Delete'},3000);return}rm(s.id);open()};r.append(x)}
+    bx.append(r)});
+  const ad=el('div','add');ad.innerHTML='<h3>Add a ship</h3><div class="r"><input type="text" id="sh-n" placeholder="Ship name, e.g. Norwegian Encore"></div><label><input type="radio" name="sh-m" value="b" checked> Start blank</label><label><input type="radio" name="sh-m" value="c"> Copy this ship\'s setup (no photos, files or credentials)</label><div class="r" style="margin-top:8px"><button class="pri" id="sh-a">Add ship</button><button id="sh-x">Close</button></div><small>Each ship keeps its own credentials, tasks, hardware, checklist, notes and photos. Use 📦 to export a ship for handover.</small>';
+  bx.append(ad);
+  $('#sh-a').onclick=()=>{const n=$('#sh-n').value.trim();if(!n){$('#sh-n').focus();return}
+    const c=document.querySelector('input[name=sh-m]:checked').value==='c';
+    add(n,blank(n,c?DATA:null),[]);$('#sh').classList.remove('open')};
+  $('#sh-x').onclick=()=>$('#sh').classList.remove('open');
+  if(show!==false)$('#sh').classList.add('open');
+}
+function sw(id){active=id;persist();loadData();renderPage();lab();window.scrollTo(0,0)}
+function add(name,d,n){
+  const id='s'+Date.now().toString(36);ships.push({id,name});
+  localStorage.setItem(K(id).d,JSON.stringify(d));localStorage.setItem(K(id).n,JSON.stringify(n||[]));sw(id);return id;
+}
+function rm(id){
+  const d=rd(K(id).d,null);
+  if(d&&window.__tx)[...Object.values(d.tasks).flat(),...(d.checklist||[])].forEach(o=>(o.files||[]).forEach(f=>window.__tx('readwrite',s=>s.delete(f.id)).catch(()=>{})));
+  localStorage.removeItem(K(id).d);localStorage.removeItem(K(id).n);
+  ships=ships.filter(s=>s.id!==id);
+  if(active===id)sw(ships[0].id);else persist();
+}
+window.addShipFromData=(d,n)=>{const nm=(d.hero&&d.hero.badgeShip)||'Imported ship';return add(nm,d,n)};
+const ov=el('div');ov.id='sh';ov.innerHTML='<div class="box"></div>';ov.onclick=e=>{if(e.target===ov)ov.classList.remove('open')};document.body.append(ov);
+btn.onclick=()=>open();
+persist();lab();
+if(active!=='default'){loadData();renderPage()}
+})();
+</script>
+<style>
+.task-photo-wrap{vertical-align:top;margin:0 6px 6px 0}
+.ph-cap{font-size:10px;line-height:1.25;color:var(--slate);width:72px;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#lb{position:fixed;inset:0;background:rgba(10,22,40,.94);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;overflow:auto}
+#lb.open{display:flex}
+#lb .stage{position:relative;display:inline-block;max-width:92vw}
+#lb .stage img{max-width:92vw;max-height:58vh;display:block;border-radius:8px}
+#lb .bar{display:flex;gap:8px;width:min(92vw,720px)}
+#lb input,.fl-form input{flex:1;min-width:0;padding:8px 10px;border-radius:6px;border:1px solid var(--border);font:14px Inter,sans-serif}
+#lb button,.fl-btn{background:#fff;border:1px solid var(--border);border-radius:6px;padding:7px 12px;font:600 12px Inter,sans-serif;color:var(--navy);cursor:pointer}
+#lb button.on{background:var(--teal);color:#fff}
+.pin{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:var(--red);color:#fff;font:700 12px/18px Inter,sans-serif;text-align:center;border:2px solid #fff}
+.pin-n{flex:0 0 22px;height:22px;border-radius:50%;background:var(--red);color:#fff;font:700 12px/22px Inter,sans-serif;text-align:center}
+#lb-leg{flex-direction:column}#lb-leg .leg{display:flex;gap:8px;align-items:center}
+.fl-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.fl-chip{background:var(--sky);border:1px solid var(--border);border-radius:14px;padding:3px 10px;font-size:12px;color:var(--ocean);cursor:pointer;text-decoration:none}
+.fl-chip b{margin-left:8px;color:var(--red);cursor:pointer}
+.fl-form{display:none;gap:6px;width:100%}.fl-form.open{display:flex}
+.fl-in{display:none}
+@media print{.fl-btn,.fl-form{display:none!important}}
+</style>
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const kb=n=>n>1e6?(n/1e6).toFixed(1)+' MB':Math.max(1,Math.round(n/1e3))+' KB';
+let META={};try{META=JSON.parse(localStorage.getItem('apmp_meta')||'{}')}catch(e){}
+const saveMeta=()=>{try{localStorage.setItem('apmp_meta',JSON.stringify(META))}catch(e){}};
+const fp=s=>{let h=0;for(let i=0;i<s.length;i+=37)h=(h*31+s.charCodeAt(i))|0;return s.length+':'+h};
+const md=s=>META[fp(s)]||(META[fp(s)]={cap:'',pins:[]});
+const _ci=window.compressImage;window.compressImage=f=>_ci(f,800,800,.6);
+function objOf(x){const t=x.closest('.task-item');if(t)return (DATA.tasks[t.dataset.type]||[])[+t.dataset.idx];const c=x.closest('.check-item');if(c)return DATA.checklist[+c.id.replace('chk-item-','')]}
+// ---- IndexedDB for attachments
+const idb=new Promise(r=>{try{const q=indexedDB.open('apmp_files',1);q.onupgradeneeded=()=>q.result.createObjectStore('f');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
+const tx=async(mode,fn)=>{const d=await idb;if(!d)throw 0;return new Promise((res,rej)=>{const rq=fn(d.transaction('f',mode).objectStore('f'));rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej()})};window.__tx=tx;
+// ---- Lightbox
+const lb=el('div');lb.id='lb';
+lb.innerHTML='<div class="stage"><img alt=""></div><div class="bar"><button id="lb-p">‹</button><input id="lb-c" placeholder="Caption — what is this photo showing?"><button id="lb-n">›</button></div><div class="bar"><button id="lb-pin">📍 Add pin</button><button id="lb-x">Close</button></div><div class="bar" id="lb-leg"></div>';
+document.body.append(lb);
+let list=[],ix=0,pinMode=false;
+function draw(){
+  const s=list[ix],d=md(s),st=lb.querySelector('.stage');
+  st.querySelector('img').src=s;st.querySelectorAll('.pin').forEach(p=>p.remove());
+  d.pins.forEach((p,i)=>{const e=el('div','pin',i+1);e.style.left=p.x+'%';e.style.top=p.y+'%';st.append(e)});
+  $('#lb-c').value=d.cap;st.style.cursor=pinMode?'crosshair':'default';
+  $('#lb-pin').classList.toggle('on',pinMode);$('#lb-pin').textContent=pinMode?'📍 Tap photo to place pin':'📍 Add pin';
+  const lg=$('#lb-leg');lg.innerHTML='';
+  d.pins.forEach((p,i)=>{const r=el('div','leg');const inp=el('input');inp.value=p.t||'';inp.placeholder='What is at pin '+(i+1)+'?';inp.oninput=()=>{p.t=inp.value;saveMeta()};const x=el('button',null,'✕');x.onclick=()=>{d.pins.splice(i,1);saveMeta();draw();caps()};r.append(el('span','pin-n',i+1),inp,x);lg.append(r)});
+}
+const go=n=>{ix=(ix+n+list.length)%list.length;draw()};
+$('#lb-p').onclick=()=>go(-1);$('#lb-n').onclick=()=>go(1);
+$('#lb-x').onclick=()=>{lb.classList.remove('open');pinMode=false};
+$('#lb-pin').onclick=()=>{pinMode=!pinMode;draw()};
+$('#lb-c').oninput=e=>{md(list[ix]).cap=e.target.value;saveMeta();caps()};
+lb.onclick=e=>{if(e.target===lb)$('#lb-x').click();if(pinMode&&e.target.matches('.stage>img')){const r=e.target.getBoundingClientRect();md(list[ix]).pins.push({x:+((e.clientX-r.left)/r.width*100).toFixed(1),y:+((e.clientY-r.top)/r.height*100).toFixed(1),t:''});saveMeta();pinMode=false;draw();caps()}};
+document.addEventListener('keydown',e=>{if(!lb.classList.contains('open'))return;if(e.key==='Escape')$('#lb-x').click();else if(e.target.tagName!=='INPUT'){if(e.key==='ArrowLeft')go(-1);if(e.key==='ArrowRight')go(1)}});
+function caps(){document.querySelectorAll('.task-photo-wrap').forEach(w=>{const i=w.querySelector(':scope>img');if(!i)return;let c=w.querySelector(':scope>.ph-cap');if(!c){c=el('div','ph-cap');w.append(c)}const d=META[fp(i.src)],t=d?((d.pins.length?'📍'+d.pins.length+' ':'')+d.cap):'';if(c.textContent!==t){c.textContent=t;c.title=t}})}
+// ---- Files & links row
+function paint(row){
+  const o=objOf(row);if(!o)return;row.innerHTML='';
+  (o.files||[]).forEach((f,i)=>{const c=el('span','fl-chip','📄 '+f.name+' · '+kb(f.size));c.dataset.a='of';c.dataset.i=i;const x=el('b',null,'✕');x.dataset.a='df';x.dataset.i=i;c.append(x);row.append(c)});
+  (o.links||[]).forEach((l,i)=>{const c=el('a','fl-chip','🔗 '+l.title);c.href=l.url;c.target='_blank';c.rel='noopener';const x=el('b',null,'✕');x.dataset.a='dl';x.dataset.i=i;c.append(x);row.append(c)});
+  const b1=el('button','fl-btn','📎 File');b1.dataset.a='af';const b2=el('button','fl-btn','🔗 Link');b2.dataset.a='tl';
+  const inp=el('input','fl-in');inp.type='file';inp.multiple=true;
+  const fm=el('div','fl-form');const t=el('input');t.placeholder='Link title';t.className='lt';const u=el('input');u.placeholder='https://…';u.className='lu';const s=el('button','fl-btn','Add');s.dataset.a='sl';fm.append(t,u,s);
+  row.append(b1,b2,inp,fm);
+}
+function enh(){caps();document.querySelectorAll('.task-item .task-body,.check-item .chk-body').forEach(b=>{if(!b.querySelector(':scope>.fl-row')){const r=el('div','fl-row');b.append(r);paint(r)}})}
+let tm;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(enh,60)}).observe(document.body,{childList:true,subtree:true});
+document.addEventListener('click',async e=>{
+  const im=e.target.closest('.task-photo-wrap>img');
+  if(im){e.preventDefault();list=[...im.closest('.task-photo-wrap').parentNode.querySelectorAll(':scope>.task-photo-wrap>img')].map(x=>x.src);ix=Math.max(0,list.indexOf(im.src));pinMode=false;draw();lb.classList.add('open');return}
+  const t=e.target.closest('[data-a]');if(!t)return;
+  const a=t.dataset.a,i=+t.dataset.i;
+  if(a==='ex')return exportPkg();if(a==='im')return $('#pkg-in').click();
+  const row=t.closest('.fl-row');if(!row)return;const o=objOf(row);if(!o)return;
+  if(a==='af')row.querySelector('.fl-in').click();
+  else if(a==='tl')row.querySelector('.fl-form').classList.toggle('open');
+  else if(a==='sl'){const ti=row.querySelector('.lt').value.trim();let u=row.querySelector('.lu').value.trim();if(!u)return;if(!/^https?:\/\//i.test(u))u='https://'+u;(o.links=o.links||[]).push({title:ti||u.replace(/^https?:\/\//,'').slice(0,40),url:u});saveData();paint(row)}
+  else if(a==='dl'){e.preventDefault();o.links.splice(i,1);saveData();paint(row)}
+  else if(a==='df'){e.stopPropagation();try{await tx('readwrite',s=>s.delete(o.files[i].id))}catch(x){}o.files.splice(i,1);saveData();paint(row)}
+  else if(a==='of'){try{const b=await tx('readonly',s=>s.get(o.files[i].id));if(!b)return alert('File data not found on this device.');const w=window.open(URL.createObjectURL(b),'_blank');if(!w)await save(o.files[i].name,b)}catch(x){alert('Could not open file.')}}
+});
+document.addEventListener('change',async e=>{
+  if(!e.target.matches('.fl-in'))return;const row=e.target.closest('.fl-row'),o=objOf(row);if(!o)return;
+  for(const f of e.target.files){
+    if(f.size>8e6){alert(f.name+' is over 8 MB — skipped.');continue}
+    const id='f'+Date.now()+Math.random().toString(36).slice(2,7);
+    try{await tx('readwrite',s=>s.put(f,id));(o.files=o.files||[]).push({id,name:f.name,size:f.size,type:f.type})}catch(x){alert('This browser blocked file storage.')}
+  }
+  saveData();paint(row);e.target.value='';
+});
+// ---- Save helper + package export/import
+async function save(name,data){
+  try{const dl=window.claude&&await claude.use('downloads');if(dl){await dl.save({filename:name,data});return}}catch(e){if(e&&e.code==='declined')return}
+  const a=el('a');a.href=URL.createObjectURL(new Blob([data]));a.download=name;a.click();
+}
+window.exportNotes=function(){
+  if(!notes.length)return alert('No notes to export.');
+  let t='APMP HANDOVER — ADDITIONAL NOTES\n'+'='.repeat(40)+'\n\n';
+  notes.forEach((n,i)=>{t+='['+(i+1)+'] '+(n.title||'(Untitled)')+'\n'+'-'.repeat(30)+'\n'+(n.body||'')+'\n\n'});
+  save('APMP_Additional_Notes.txt',t);
+};
+const objs=()=>[...Object.values(DATA.tasks).flat(),...DATA.checklist];
+const toUrl=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+const toBlob=u=>{const [h,b]=u.split(',');const s=atob(b),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return new Blob([a],{type:h.slice(5).split(';')[0]})};
+async function exportPkg(){
+  const files={};
+  for(const o of objs())for(const f of(o.files||[])){try{const b=await tx('readonly',s=>s.get(f.id));if(b)files[f.id]=await toUrl(b)}catch(x){}}
+  await save('APMP_handover_package.json',JSON.stringify({v:1,DATA,notes,META,files}));
+}
+const pin=el('input');pin.type='file';pin.id='pkg-in';pin.accept='.json';pin.style.display='none';document.body.append(pin);
+pin.onchange=async()=>{
+  try{
+    const p=JSON.parse(await pin.files[0].text());if(p.v!==1||!p.DATA)throw 0;
+    for(const id in p.files||{})await tx('readwrite',st=>st.put(toBlob(p.files[id]),id));
+    Object.assign(META,p.META||{});saveMeta();addShipFromData(p.DATA,p.notes||[]);
+  }catch(x){alert('That file is not a valid handover package.')}
+  pin.value='';
+};
+const ti=$('.toc-inner');
+[['📦','Export handover package (photos + files)','ex'],['📥','Import handover package','im']].forEach(([i,t,a])=>{const b=el('button','toc-btn toc-icon-btn',i);b.title=t;b.dataset.a=a;ti.append(b)});
+enh();
+})();
+</script>
 </body>
 </html>
