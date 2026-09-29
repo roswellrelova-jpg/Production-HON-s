@@ -1517,5 +1517,28 @@ const ti=$('.toc-inner');
 enh();
 })();
 </script>
+<style>
+.toc-actions{position:sticky;right:0;display:flex;flex-shrink:0;margin-left:auto;background:#fff;box-shadow:-10px 0 10px -8px rgba(10,22,40,.15);z-index:2}
+.toc-actions .toc-btn{flex-shrink:0}
+.toc-actions .ship-b{max-width:170px;overflow:hidden;text-overflow:ellipsis}
+.toc-arr{display:none;font-size:20px;padding:8px 10px !important}
+.toc-inner.ovf .toc-arr{display:block}
+</style>
+<script>
+(function(){
+const bar=document.querySelector('.toc-inner');if(!bar)return;
+const first=bar.querySelector('.toc-divider');if(!first)return;
+const g=document.createElement('div');g.className='toc-actions';
+const mk=(t,d)=>{const b=document.createElement('button');b.className='toc-btn toc-arr';b.textContent=t;b.title=d>0?'Scroll right':'Scroll left';b.onclick=()=>bar.scrollBy({left:d*220,behavior:'smooth'});return b};
+g.append(mk('‹',-1),mk('›',1));
+[...bar.children].slice([...bar.children].indexOf(first)).forEach(n=>g.append(n));
+bar.append(g);
+const sb=[...g.querySelectorAll('.toc-btn')].find(b=>b.textContent.startsWith('🚢'));if(sb)sb.classList.add('ship-b');
+const chk=()=>bar.classList.toggle('ovf',bar.scrollWidth-g.offsetWidth>bar.clientWidth-g.offsetWidth+2);
+bar.addEventListener('wheel',e=>{if(bar.scrollWidth>bar.clientWidth&&Math.abs(e.deltaY)>Math.abs(e.deltaX)){bar.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
+new MutationObserver(chk).observe(g,{childList:true,subtree:true,characterData:true});
+addEventListener('resize',chk);chk();
+})();
+</script>
 </body>
 </html>
