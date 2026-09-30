@@ -1003,7 +1003,7 @@ function resetSettings(){
 document.addEventListener('mousemove', e => {
   const preview = document.querySelector('.task-photo-wrap:hover .photo-preview');
   if(!preview) return;
-  const pw = 360, ph = 360, margin = 14;
+  const pw = 360, ph = Math.max(360, preview.offsetHeight||0), margin = 14;
   let x = e.clientX + margin;
   let y = e.clientY + margin;
   if(x + pw > window.innerWidth)  x = e.clientX - pw - margin;
@@ -1449,6 +1449,21 @@ if(active!=='default'){loadData();renderPage()}
 .fl-chip b{margin-left:8px;color:var(--red);cursor:pointer}
 .fl-form{display:none;gap:6px;width:100%}.fl-form.open{display:flex}
 .fl-in{display:none}
+.pin{cursor:pointer;z-index:2;transition:transform .12s,background .12s}
+.pin:hover,.pin.hl{transform:scale(1.25);z-index:5;background:var(--teal)}
+.pin .pin-tip{display:none;position:absolute;left:50%;bottom:calc(100% + 9px);transform:translateX(-50%);width:max-content;max-width:220px;background:#0A1628;color:#fff;font:500 12px/1.4 Inter,sans-serif;padding:6px 10px;border-radius:6px;text-align:left;box-shadow:0 4px 14px rgba(0,0,0,.35);pointer-events:none;white-space:normal}
+.pin .pin-tip.dn{bottom:auto;top:calc(100% + 9px)}
+.pin .pin-tip.l{left:-8px;transform:none}
+.pin .pin-tip.r{left:auto;right:-8px;transform:none}
+.pin:hover .pin-tip,.pin.hl .pin-tip{display:block}
+.task-photo-wrap .photo-preview{max-height:none!important}
+.pv-stage{position:relative;display:inline-block;line-height:0}
+.task-photo-wrap .photo-preview .pv-stage img{max-height:300px}
+.photo-preview .pin{pointer-events:none;width:20px;height:20px;margin:-10px 0 0 -10px;font-size:11px;line-height:16px}
+.pv-leg{max-width:340px;padding:8px 6px 4px;font:500 12px/1.4 Inter,sans-serif;color:var(--navy)}
+.pv-leg b{display:block;margin-bottom:4px}
+.pv-leg div{display:flex;gap:7px;align-items:flex-start;margin-top:4px}
+.pv-leg .pin-n{flex:0 0 18px;height:18px;font:700 10px/18px Inter,sans-serif}
 @media print{.fl-btn,.fl-form{display:none!important}}
 </style>
 <script>
@@ -1473,20 +1488,33 @@ let list=[],ix=0,pinMode=false;
 function draw(){
   const s=list[ix],d=md(s),st=lb.querySelector('.stage');
   st.querySelector('img').src=s;st.querySelectorAll('.pin').forEach(p=>p.remove());
-  d.pins.forEach((p,i)=>{const e=el('div','pin',i+1);e.style.left=p.x+'%';e.style.top=p.y+'%';st.append(e)});
+  const pe=[];d.pins.forEach((p,i)=>{const e=el('div','pin',i+1);e.style.left=p.x+'%';e.style.top=p.y+'%';e.append(el('span','pin-tip'+(p.y<22?' dn':'')+(p.x<22?' l':p.x>78?' r':''),(p.t||'').trim()||'No description yet'));pe.push(e);st.append(e)});
   $('#lb-c').value=d.cap;st.style.cursor=pinMode?'crosshair':'default';
-  $('#lb-pin').classList.toggle('on',pinMode);$('#lb-pin').textContent=pinMode?'📍 Tap photo to place pin':'📍 Add pin';
+  $('#lb-pin').classList.toggle('on',pinMode);$('#lb-pin').textContent=pinMode?'📍 Tap photo to add pins — click to stop':'📍 Add pins';
   const lg=$('#lb-leg');lg.innerHTML='';
-  d.pins.forEach((p,i)=>{const r=el('div','leg');const inp=el('input');inp.value=p.t||'';inp.placeholder='What is at pin '+(i+1)+'?';inp.oninput=()=>{p.t=inp.value;saveMeta()};const x=el('button',null,'✕');x.onclick=()=>{d.pins.splice(i,1);saveMeta();draw();caps()};r.append(el('span','pin-n',i+1),inp,x);lg.append(r)});
+  d.pins.forEach((p,i)=>{const r=el('div','leg');const inp=el('input');inp.value=p.t||'';inp.placeholder='What is at pin '+(i+1)+'?';inp.oninput=()=>{p.t=inp.value;saveMeta();pe[i].querySelector('.pin-tip').textContent=inp.value.trim()||'No description yet'};inp.onfocus=()=>pe[i].classList.add('hl');inp.onblur=()=>pe[i].classList.remove('hl');const x=el('button',null,'✕');x.onclick=()=>{d.pins.splice(i,1);saveMeta();draw();caps()};r.onmouseenter=()=>pe[i].classList.add('hl');r.onmouseleave=()=>pe[i].classList.remove('hl');r.append(el('span','pin-n',i+1),inp,x);lg.append(r)});
 }
 const go=n=>{ix=(ix+n+list.length)%list.length;draw()};
 $('#lb-p').onclick=()=>go(-1);$('#lb-n').onclick=()=>go(1);
 $('#lb-x').onclick=()=>{lb.classList.remove('open');pinMode=false};
 $('#lb-pin').onclick=()=>{pinMode=!pinMode;draw()};
 $('#lb-c').oninput=e=>{md(list[ix]).cap=e.target.value;saveMeta();caps()};
-lb.onclick=e=>{if(e.target===lb)$('#lb-x').click();if(pinMode&&e.target.matches('.stage>img')){const r=e.target.getBoundingClientRect();md(list[ix]).pins.push({x:+((e.clientX-r.left)/r.width*100).toFixed(1),y:+((e.clientY-r.top)/r.height*100).toFixed(1),t:''});saveMeta();pinMode=false;draw();caps()}};
+lb.onclick=e=>{const pn=e.target.closest&&e.target.closest('.pin');if(pn){pn.classList.toggle('hl');return}if(e.target===lb)$('#lb-x').click();if(pinMode&&e.target.matches('.stage>img')){const r=e.target.getBoundingClientRect();md(list[ix]).pins.push({x:+((e.clientX-r.left)/r.width*100).toFixed(1),y:+((e.clientY-r.top)/r.height*100).toFixed(1),t:''});saveMeta();draw();caps();const ins=document.querySelectorAll('#lb-leg input');if(ins.length)ins[ins.length-1].focus()}};
 document.addEventListener('keydown',e=>{if(!lb.classList.contains('open'))return;if(e.key==='Escape')$('#lb-x').click();else if(e.target.tagName!=='INPUT'){if(e.key==='ArrowLeft')go(-1);if(e.key==='ArrowRight')go(1)}});
 function caps(){document.querySelectorAll('.task-photo-wrap').forEach(w=>{const i=w.querySelector(':scope>img');if(!i)return;let c=w.querySelector(':scope>.ph-cap');if(!c){c=el('div','ph-cap');w.append(c)}const d=META[fp(i.src)],t=d?((d.pins.length?'📍'+d.pins.length+' ':'')+d.cap):'';if(c.textContent!==t){c.textContent=t;c.title=t}})}
+// ---- Hover preview: pins + descriptions on thumbnails
+document.addEventListener('mouseover',e=>{
+  const w=e.target.closest&&e.target.closest('.task-photo-wrap');if(!w)return;
+  const p=w.querySelector('.photo-preview'),t=w.querySelector(':scope>img');if(!p||!t)return;
+  let st=p.querySelector('.pv-stage');
+  if(!st){const im=p.querySelector('img');if(!im)return;st=el('div','pv-stage');im.replaceWith(st);st.append(im)}
+  st.querySelectorAll('.pin').forEach(x=>x.remove());p.querySelectorAll('.pv-leg').forEach(x=>x.remove());
+  const d=META[fp(t.src)];if(!d||(!d.pins.length&&!d.cap))return;
+  d.pins.forEach((q,i)=>{const n=el('div','pin',i+1);n.style.left=q.x+'%';n.style.top=q.y+'%';st.append(n)});
+  const lg=el('div','pv-leg');if(d.cap)lg.append(el('b',null,d.cap));
+  d.pins.forEach((q,i)=>{const r=el('div');r.append(el('span','pin-n',i+1),el('span',null,(q.t||'').trim()||'—'));lg.append(r)});
+  p.append(lg);
+});
 // ---- Files & links row
 function paint(row){
   const o=objOf(row);if(!o)return;row.innerHTML='';
