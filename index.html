@@ -321,6 +321,29 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
 #landing .l-primary:hover{background:#E8F4FA;transform:translateY(-1px);}
 #landing .l-foot{margin-top:44px;font:400 12px/1.6 'Inter',sans-serif;color:rgba(255,255,255,.4);}
 </style>
+<style>
+#srch-fab{position:fixed;right:18px;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:8px;background:var(--navy,#0A1628);color:#fff;border:0;border-radius:28px;padding:12px 18px;font:600 13px Inter,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(10,22,40,.3);transition:transform .15s}
+#srch-fab:hover{transform:translateY(-2px)}
+#srch-fab kbd{font:500 10px 'JetBrains Mono',monospace;background:rgba(255,255,255,.15);border-radius:4px;padding:2px 6px;margin-left:2px}
+#srch{position:fixed;inset:0;z-index:900;background:rgba(10,22,40,.55);display:none;align-items:flex-start;justify-content:center;padding:max(64px,env(safe-area-inset-top,0px)) 14px 14px}
+#srch.open{display:flex}
+#srch .s-box{width:100%;max-width:640px;background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(10,22,40,.4);overflow:hidden;display:flex;flex-direction:column;max-height:calc(100% - 10px)}
+#srch .s-top{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid #DCE6EF}
+#srch .s-top input{flex:1;min-width:0;border:0;outline:0;font:500 16px Inter,sans-serif;color:#0A1628;background:transparent}
+#srch .s-top button{border:0;background:#EEF4FA;color:#3B5270;border-radius:6px;padding:6px 10px;font:600 12px Inter,sans-serif;cursor:pointer}
+#srch .s-meta{padding:8px 16px;font:500 12px Inter,sans-serif;color:#6B7F95;background:#F7FAFD;border-bottom:1px solid #DCE6EF}
+#srch .s-list{overflow-y:auto;overscroll-behavior:contain}
+#srch .s-item{display:block;width:100%;text-align:left;border:0;background:#fff;border-bottom:1px solid #EEF3F8;padding:12px 16px;cursor:pointer;font-family:Inter,sans-serif}
+#srch .s-item:hover,#srch .s-item.sel{background:#EAF4FA}
+#srch .s-sec{font:600 10px Inter,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#0B7EA8}
+#srch .s-title{font:600 14px Inter,sans-serif;color:#0A1628;margin:3px 0 2px}
+#srch .s-snip{font:400 12.5px/1.45 Inter,sans-serif;color:#51657D;word-break:break-word}
+#srch mark{background:#FFE58A;color:inherit;border-radius:2px;padding:0 1px}
+#srch .s-empty{padding:28px 16px;text-align:center;font:400 13px Inter,sans-serif;color:#6B7F95}
+.srch-flash{animation:srchflash 2.6s ease-out;border-radius:8px}
+@keyframes srchflash{0%,60%{outline:3px solid #F5B301;outline-offset:3px;background-color:rgba(255,229,138,.45)}100%{outline:3px solid transparent;outline-offset:3px}}
+@media print{#srch-fab,#srch{display:none!important}}
+</style>
 </head>
 <body>
 <div id="landing" role="dialog" aria-label="Welcome">
@@ -1664,6 +1687,94 @@ function enter(){L.classList.add('hide');document.body.style.overflow='';setTime
 document.getElementById('l-enter').onclick=enter;
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!L.classList.contains('hide'))enter();});
 document.body.style.overflow='hidden';
+})();
+</script>
+<button id="srch-fab" aria-label="Search the handover notes">🔍 Search <kbd>Ctrl K</kbd></button>
+<div id="srch" role="dialog" aria-label="Search">
+  <div class="s-box">
+    <div class="s-top"><span>🔍</span><input id="s-in" type="search" placeholder="Search a word… e.g. locker, printer, Okta" autocomplete="off"><button id="s-x">Esc</button></div>
+    <div class="s-meta" id="s-meta">Type a word to search every section.</div>
+    <div class="s-list" id="s-list"></div>
+  </div>
+</div>
+<script>
+(function(){
+var SEL='.cred-item,.phone-item,.task-item,.check-item,.hw-item,.extra-entry,.card';
+var S=document.getElementById('srch'),IN=document.getElementById('s-in'),LIST=document.getElementById('s-list'),META=document.getElementById('s-meta');
+var cur=[],sel=0;
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function textOf(u){
+  if(u.classList.contains('extra-entry'))return Array.prototype.map.call(u.querySelectorAll('input,textarea'),function(x){return x.value}).join(' — ');
+  var out=[],w=document.createTreeWalker(u,NodeFilter.SHOW_TEXT,{acceptNode:function(n){
+    var p=n.parentElement;if(!p||p.closest('textarea,script,style,button'))return 2;
+    var r=p.closest('.cred-row');if(r){var l=r.querySelector('.cred-label');if(l&&/password/i.test(l.textContent))return 2}
+    return 1}});
+  while(w.nextNode()){var v=w.currentNode.nodeValue.trim();if(v)out.push(v)}
+  return out.join(' ');
+}
+function titleOf(u){
+  if(u.classList.contains('extra-entry')){var i=u.querySelector('input');return (i&&i.value.trim())||'Untitled note'}
+  var t=u.querySelector('.cred-service,.task-title-view,.phone-name,.hw-name,.card-head,.chk-title');
+  if(t&&t.textContent.trim())return t.textContent.trim();
+  var x=textOf(u);return x.slice(0,50)||'Item';
+}
+function units(){
+  var all=Array.prototype.slice.call(document.querySelectorAll('main '+SEL.split(',').join(',main '))||[]);
+  if(!all.length)all=Array.prototype.slice.call(document.querySelectorAll(SEL));
+  return all.filter(function(u){return !u.querySelector(SEL)&&u.closest('section')});
+}
+function run(q){
+  q=q.trim().toLowerCase();LIST.innerHTML='';cur=[];sel=0;
+  if(!q){META.textContent='Type a word to search every section.';return}
+  var words=q.split(/\s+/).filter(Boolean),res=[];
+  units().forEach(function(u){
+    var txt=textOf(u),low=txt.toLowerCase(),ti=titleOf(u),tl=ti.toLowerCase();
+    var hay=tl+' '+low;
+    if(!words.every(function(w){return hay.indexOf(w)>-1}))return;
+    var score=words.every(function(w){return tl.indexOf(w)>-1})?0:1;
+    var sec=u.closest('section'),h=sec&&sec.querySelector('.section-title');
+    res.push({u:u,title:ti,txt:txt,score:score,sec:h?h.textContent.trim():''});
+  });
+  res.sort(function(a,b){return a.score-b.score});
+  cur=res.slice(0,40);
+  META.textContent=res.length?(res.length+' result'+(res.length>1?'s':'')+(res.length>40?' — showing first 40':'')):'No results';
+  if(!res.length){LIST.innerHTML='<div class="s-empty">Nothing found for “'+esc(q)+'”. Try a shorter or different word.</div>';return}
+  cur.forEach(function(r,i){
+    var low=r.txt.toLowerCase(),pos=-1;
+    words.forEach(function(w){var k=low.indexOf(w);if(k>-1&&(pos<0||k<pos))pos=k});
+    var a=Math.max(0,pos-40),snip=r.txt.slice(a,a+130);if(a>0)snip='…'+snip;if(a+130<r.txt.length)snip+='…';
+    var h=esc(snip);words.forEach(function(w){h=h.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')});
+    var b=document.createElement('button');b.className='s-item'+(i===0?' sel':'');b.type='button';
+    var t=esc(r.title);words.forEach(function(w){t=t.replace(new RegExp('('+w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')});
+    b.innerHTML='<div class="s-sec">'+esc(r.sec)+'</div><div class="s-title">'+t+'</div><div class="s-snip">'+h+'</div>';
+    b.onclick=function(){go(i)};LIST.appendChild(b);
+  });
+}
+function go(i){
+  var r=cur[i];if(!r)return;close();
+  setTimeout(function(){
+    r.u.scrollIntoView({behavior:'smooth',block:'center'});
+    r.u.classList.remove('srch-flash');void r.u.offsetWidth;r.u.classList.add('srch-flash');
+    setTimeout(function(){r.u.classList.remove('srch-flash')},2700);
+  },60);
+}
+function mark(){var k=LIST.querySelectorAll('.s-item');k.forEach(function(e,i){e.classList.toggle('sel',i===sel)});if(k[sel])k[sel].scrollIntoView({block:'nearest'})}
+function open(){S.classList.add('open');IN.focus();IN.select();run(IN.value)}
+function close(){S.classList.remove('open');IN.blur()}
+document.getElementById('srch-fab').onclick=open;
+document.getElementById('s-x').onclick=close;
+S.addEventListener('mousedown',function(e){if(e.target===S)close()});
+IN.addEventListener('input',function(){run(IN.value)});
+IN.addEventListener('keydown',function(e){
+  if(e.key==='ArrowDown'){e.preventDefault();sel=Math.min(cur.length-1,sel+1);mark()}
+  else if(e.key==='ArrowUp'){e.preventDefault();sel=Math.max(0,sel-1);mark()}
+  else if(e.key==='Enter'){e.preventDefault();go(sel)}
+});
+document.addEventListener('keydown',function(e){
+  var L=document.getElementById('landing');if(L&&!L.classList.contains('hide'))return;
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();S.classList.contains('open')?close():open()}
+  else if(e.key==='Escape'&&S.classList.contains('open'))close();
+});
 })();
 </script>
 </body>
