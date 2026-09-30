@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="author" content="Roswell Relova">
 <title>Handover Notes — Norwegian Aqua APMP</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
 <style>
 :root{
   --navy:#0A1628;--ocean:#0E3A6E;--teal:#0B7EA8;
@@ -220,6 +221,7 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
 
 /* FOOTER */
 .footer{background:var(--navy);color:rgba(255,255,255,.45);text-align:center;font-size:12px;padding:20px;}
+.copyright{background:var(--navy);color:rgba(255,255,255,.6);text-align:center;font-size:12px;font-weight:500;padding:0 20px 22px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px;}
 
 /* SETTINGS DRAWER */
 .settings-overlay{position:fixed;inset:0;background:rgba(10,22,40,.5);z-index:200;display:none;backdrop-filter:blur(3px);}
@@ -300,8 +302,43 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
   .path-chip{border:1px solid #ccc;background:#f5f5f5;}
 }
 </style>
+<style>
+#landing{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(32px,env(safe-area-inset-top,0px)) 24px max(28px,env(safe-area-inset-bottom,0px));background:radial-gradient(1200px 600px at 80% -10%,rgba(11,126,168,.45),transparent 60%),linear-gradient(160deg,#0A1628 0%,#0E3A6E 70%,#0B7EA8 130%);color:#fff;overflow-y:auto;transition:opacity .45s ease,visibility .45s;}
+#landing.hide{opacity:0;visibility:hidden;pointer-events:none;}
+#landing .l-wrap{width:100%;max-width:760px;text-align:center;}
+#landing .l-tag{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);font:600 11px/1 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:8px 14px;border-radius:20px;}
+#landing h1{font:700 clamp(30px,6vw,52px)/1.1 'Inter',sans-serif;letter-spacing:-.025em;margin:22px 0 10px;}
+#landing .l-sub{font:400 15px/1.5 'Inter',sans-serif;color:rgba(255,255,255,.65);}
+#landing .l-rule{width:56px;height:2px;background:rgba(255,255,255,.35);margin:34px auto;border:0;}
+#landing .l-date{font:600 11px/1 'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:18px;}
+#landing .l-verse{font:italic 500 clamp(21px,3.6vw,30px)/1.5 'Cormorant Garamond',Georgia,'Times New Roman',serif;color:#fff;transition:opacity .3s;}
+#landing .l-ref{margin-top:16px;font:600 13px/1 'Inter',sans-serif;letter-spacing:.08em;color:#8fd3ee;transition:opacity .3s;}
+#landing .l-ref small{color:rgba(255,255,255,.45);font-weight:500;letter-spacing:.06em;margin-left:6px;}
+#landing .l-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:40px;}
+#landing .l-btn{font:600 14px/1 'Inter',sans-serif;padding:14px 26px;border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;transition:background .15s,transform .15s;}
+#landing .l-btn:hover{background:rgba(255,255,255,.18);}
+#landing .l-primary{background:#fff;color:#0A1628;border-color:#fff;}
+#landing .l-primary:hover{background:#E8F4FA;transform:translateY(-1px);}
+#landing .l-foot{margin-top:44px;font:400 12px/1.6 'Inter',sans-serif;color:rgba(255,255,255,.4);}
+</style>
 </head>
 <body>
+<div id="landing" role="dialog" aria-label="Welcome">
+  <div class="l-wrap">
+    <span class="l-tag">🚢 Norwegian Aqua</span>
+    <h1>APMP Handover Notes</h1>
+    <p class="l-sub">Assistant Photo Manager — Production Handover Reference</p>
+    <hr class="l-rule">
+    <div class="l-date" id="l-date"></div>
+    <blockquote class="l-verse" id="l-verse" style="margin:0"></blockquote>
+    <div class="l-ref" id="l-ref"></div>
+    <div class="l-actions">
+      <button class="l-btn l-primary" id="l-enter">Open Handover Notes →</button>
+      <button class="l-btn" id="l-next">Next verse</button>
+    </div>
+    <div class="l-foot">Verse of the day changes automatically every day.<br>© 2026 Roswell Relova. All rights reserved.</div>
+  </div>
+</div>
 
 <!-- PDF MODAL -->
 <div class="pdf-modal-overlay" id="pdfModal">
@@ -432,7 +469,7 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
     <div class="hero-meta">
       <div class="hero-badge"><span>Ship</span><strong id="pg-badge-ship">Norwegian Aqua</strong></div>
       <div class="hero-badge"><span>Role</span><strong id="pg-badge-role">Asst. Photo Manager</strong></div>
-      <div class="hero-badge"><span>Department</span><strong id="pg-badge-dept">Photography &amp; Retail</strong></div>
+      <div class="hero-badge"><span>Department</span><strong id="pg-badge-dept">Photo Department</strong></div>
       <div class="hero-btns">
         <button class="btn-hero btn-hero-settings" onclick="openSettings()">⚙️ Edit / Settings</button>
         <button class="btn-hero" onclick="openPdfModal()">📄 Download PDF</button>
@@ -537,14 +574,15 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
   </section>
 
 </main>
-<footer class="footer" id="pg-footer">Norwegian Aqua · APMP Handover Reference · Photography &amp; Retail Department</footer>
+<footer class="footer" id="pg-footer">Norwegian Aqua · APMP Handover Reference · Photo Department</footer>
+<div class="copyright">© 2026 Roswell Relova. All rights reserved.</div>
 
 <script>
 // ══════════════════════════════
 // DEFAULTS
 // ══════════════════════════════
 const DEFAULTS = {
-  hero:{shipTag:'🚢 Norwegian Aqua',title:'APMP Handover Notes',subtitle:'Assistant Photo Manager — Production Handover Reference',badgeShip:'Norwegian Aqua',badgeRole:'Asst. Photo Manager',badgeDept:'Photography & Retail',footer:'Norwegian Aqua · APMP Handover Reference · Photography & Retail Department'},
+  hero:{shipTag:'🚢 Norwegian Aqua',title:'APMP Handover Notes',subtitle:'Assistant Photo Manager — Production Handover Reference',badgeShip:'Norwegian Aqua',badgeRole:'Asst. Photo Manager',badgeDept:'Photo Department',footer:'Norwegian Aqua · APMP Handover Reference · Photo Department'},
   creds:[
     {service:'Windows',            user:'Photolab422',          pass:'Isaiah@3416',   note:''},
     {service:'Photographer Account',user:'Photostaff422',       pass:'Bluesky299!',   note:''},
@@ -1538,6 +1576,66 @@ const chk=()=>bar.classList.toggle('ovf',bar.scrollWidth-g.offsetWidth>bar.clien
 bar.addEventListener('wheel',e=>{if(bar.scrollWidth>bar.clientWidth&&Math.abs(e.deltaY)>Math.abs(e.deltaX)){bar.scrollLeft+=e.deltaY;e.preventDefault()}},{passive:false});
 new MutationObserver(chk).observe(g,{childList:true,subtree:true,characterData:true});
 addEventListener('resize',chk);chk();
+})();
+</script>
+<script>
+(function(){
+var V=[
+["The LORD is my shepherd; I shall not want.","Psalm 23:1"],
+["Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.","Proverbs 3:5-6"],
+["I can do all things through Christ which strengtheneth me.","Philippians 4:13"],
+["For I know the thoughts that I think toward you, saith the LORD, thoughts of peace, and not of evil, to give you an expected end.","Jeremiah 29:11"],
+["Fear thou not; for I am with thee: be not dismayed; for I am thy God: I will strengthen thee; yea, I will help thee; yea, I will uphold thee with the right hand of my righteousness.","Isaiah 41:10"],
+["Have not I commanded thee? Be strong and of a good courage; be not afraid, neither be thou dismayed: for the LORD thy God is with thee whithersoever thou goest.","Joshua 1:9"],
+["God is our refuge and strength, a very present help in trouble.","Psalm 46:1"],
+["And we know that all things work together for good to them that love God, to them who are the called according to his purpose.","Romans 8:28"],
+["But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.","Matthew 6:33"],
+["I will lift up mine eyes unto the hills, from whence cometh my help. My help cometh from the LORD, which made heaven and earth.","Psalm 121:1-2"],
+["And whatsoever ye do, do it heartily, as to the Lord, and not unto men.","Colossians 3:23"],
+["Commit thy works unto the LORD, and thy thoughts shall be established.","Proverbs 16:3"],
+["Commit thy way unto the LORD; trust also in him; and he shall bring it to pass.","Psalm 37:5"],
+["And let us not be weary in well doing: for in due season we shall reap, if we faint not.","Galatians 6:9"],
+["For God hath not given us the spirit of fear; but of power, and of love, and of a sound mind.","2 Timothy 1:7"],
+["Come unto me, all ye that labour and are heavy laden, and I will give you rest.","Matthew 11:28"],
+["Thy word is a lamp unto my feet, and a light unto my path.","Psalm 119:105"],
+["But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.","Isaiah 40:31"],
+["Be careful for nothing; but in every thing by prayer and supplication with thanksgiving let your requests be made known unto God.","Philippians 4:6"],
+["For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life.","John 3:16"],
+["Seest thou a man diligent in his business? he shall stand before kings; he shall not stand before mean men.","Proverbs 22:29"],
+["Whatsoever thy hand findeth to do, do it with thy might.","Ecclesiastes 9:10"],
+["The LORD is my light and my salvation; whom shall I fear? the LORD is the strength of my life; of whom shall I be afraid?","Psalm 27:1"],
+["Let all your things be done with charity.","1 Corinthians 16:14"],
+["Iron sharpeneth iron; so a man sharpeneth the countenance of his friend.","Proverbs 27:17"],
+["The LORD is my strength and my shield; my heart trusted in him, and I am helped.","Psalm 28:7"],
+["Be strong and of a good courage, fear not, nor be afraid of them: for the LORD thy God, he it is that doth go with thee; he will not fail thee, nor forsake thee.","Deuteronomy 31:6"],
+["It is of the LORD's mercies that we are not consumed, because his compassions fail not. They are new every morning: great is thy faithfulness.","Lamentations 3:22-23"],
+["He hath shewed thee, O man, what is good; and what doth the LORD require of thee, but to do justly, and to love mercy, and to walk humbly with thy God?","Micah 6:8"],
+["He that dwelleth in the secret place of the most High shall abide under the shadow of the Almighty.","Psalm 91:1"],
+["Now faith is the substance of things hoped for, the evidence of things not seen.","Hebrews 11:1"],
+["Casting all your care upon him; for he careth for you.","1 Peter 5:7"],
+["O taste and see that the LORD is good: blessed is the man that trusteth in him.","Psalm 34:8"],
+["The LORD is good, a strong hold in the day of trouble; and he knoweth them that trust in him.","Nahum 1:7"],
+["If any of you lack wisdom, let him ask of God, that giveth to all men liberally, and upbraideth not; and it shall be given him.","James 1:5"],
+["The name of the LORD is a strong tower: the righteous runneth into it, and is safe.","Proverbs 18:10"],
+["Now the God of hope fill you with all joy and peace in believing, that ye may abound in hope, through the power of the Holy Ghost.","Romans 15:13"],
+["I have set the LORD always before me: because he is at my right hand, I shall not be moved.","Psalm 16:8"]
+];
+var L=document.getElementById('landing');if(!L)return;
+var now=new Date();
+var day=Math.floor(Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())/86400000);
+var idx=day%V.length;
+var vEl=document.getElementById('l-verse'),rEl=document.getElementById('l-ref');
+document.getElementById('l-date').textContent=now.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+function show(i,fade){
+  var go=function(){vEl.textContent='\u201C'+V[i][0]+'\u201D';rEl.innerHTML=V[i][1]+'<small>KJV</small>';vEl.style.opacity=rEl.style.opacity=1;};
+  if(fade){vEl.style.opacity=rEl.style.opacity=0;setTimeout(go,250);}else go();
+}
+show(idx,false);
+document.getElementById('l-next').onclick=function(){idx=(idx+1)%V.length;show(idx,true);};
+function enter(){L.classList.add('hide');document.body.style.overflow='';setTimeout(function(){L.style.display='none';},500);}
+document.getElementById('l-enter').onclick=enter;
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!L.classList.contains('hide'))enter();});
+document.body.style.overflow='hidden';
 })();
 </script>
 </body>
