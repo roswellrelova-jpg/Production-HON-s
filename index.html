@@ -322,7 +322,22 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
 #landing .l-foot{margin-top:44px;font:400 12px/1.6 'Inter',sans-serif;color:rgba(255,255,255,.4);}
 </style>
 <style>
-#srch-fab{position:fixed;right:18px;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:60;display:flex;align-items:center;gap:8px;background:var(--navy,#0A1628);color:#fff;border:0;border-radius:28px;padding:12px 18px;font:600 13px Inter,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(10,22,40,.3);transition:transform .15s}
+#fab-row{position:fixed;right:18px;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:60;display:flex;gap:10px;align-items:center}
+#wa-fab{display:flex;align-items:center;gap:7px;background:#25D366;color:#fff;border:0;border-radius:28px;padding:12px 18px;font:600 13px Inter,sans-serif;cursor:pointer;text-decoration:none;box-shadow:0 6px 20px rgba(37,211,102,.35);transition:transform .15s}
+#wa-fab:hover{transform:translateY(-2px);background:#1EBE5A}
+#wa-pop{position:fixed;inset:0;z-index:900;background:rgba(10,22,40,.55);display:none;align-items:center;justify-content:center;padding:16px}
+#wa-pop.open{display:flex}
+#wa-pop .w-box{width:100%;max-width:380px;background:#fff;border-radius:14px;padding:20px;box-shadow:0 20px 60px rgba(10,22,40,.4);font-family:Inter,sans-serif}
+#wa-pop h3{font:700 16px Inter,sans-serif;color:#0A1628;margin-bottom:6px}
+#wa-pop p{font:400 13px/1.5 Inter,sans-serif;color:#51657D;margin-bottom:12px}
+#wa-pop input{width:100%;border:1px solid #DCE6EF;border-radius:8px;padding:11px 12px;font:500 15px Inter,sans-serif;outline:0}
+#wa-pop input:focus{border-color:#25D366}
+#wa-pop .w-act{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+#wa-pop .w-act button{border:0;border-radius:8px;padding:10px 16px;font:600 13px Inter,sans-serif;cursor:pointer}
+#wa-pop .w-go{background:#25D366;color:#fff}
+#wa-pop .w-no{background:#EEF4FA;color:#3B5270}
+#wa-pop .w-err{color:#C0392B;font:500 12px Inter,sans-serif;margin-top:8px;min-height:14px}
+#srch-fab{position:static;display:flex;align-items:center;gap:8px;background:var(--navy,#0A1628);color:#fff;border:0;border-radius:28px;padding:12px 18px;font:600 13px Inter,sans-serif;cursor:pointer;box-shadow:0 6px 20px rgba(10,22,40,.3);transition:transform .15s}
 #srch-fab:hover{transform:translateY(-2px)}
 #srch-fab kbd{font:500 10px 'JetBrains Mono',monospace;background:rgba(255,255,255,.15);border-radius:4px;padding:2px 6px;margin-left:2px}
 #srch{position:fixed;inset:0;z-index:900;background:rgba(10,22,40,.55);display:none;align-items:flex-start;justify-content:center;padding:max(64px,env(safe-area-inset-top,0px)) 14px 14px}
@@ -342,7 +357,7 @@ a.path-link:hover{background:var(--sky);border-color:var(--teal);}
 #srch .s-empty{padding:28px 16px;text-align:center;font:400 13px Inter,sans-serif;color:#6B7F95}
 .srch-flash{animation:srchflash 2.6s ease-out;border-radius:8px}
 @keyframes srchflash{0%,60%{outline:3px solid #F5B301;outline-offset:3px;background-color:rgba(255,229,138,.45)}100%{outline:3px solid transparent;outline-offset:3px}}
-@media print{#srch-fab,#srch{display:none!important}}
+@media print{#fab-row,#srch,#wa-pop{display:none!important}}
 </style>
 </head>
 <body>
@@ -1689,7 +1704,19 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!L.classLis
 document.body.style.overflow='hidden';
 })();
 </script>
-<button id="srch-fab" aria-label="Search the handover notes">🔍 Search <kbd>Ctrl K</kbd></button>
+<div id="fab-row">
+  <a id="wa-fab" href="#" target="_blank" rel="noopener" title="Get help on WhatsApp">💬 Help</a>
+  <button id="srch-fab" aria-label="Search the handover notes">🔍 Search <kbd>Ctrl K</kbd></button>
+</div>
+<div id="wa-pop" role="dialog" aria-label="WhatsApp help">
+  <div class="w-box">
+    <h3>💬 WhatsApp Help</h3>
+    <p>Enter the WhatsApp number to contact for help (with country code, no + or spaces — e.g. 639171234567).</p>
+    <input id="wa-num" type="tel" inputmode="numeric" placeholder="639171234567">
+    <div class="w-err" id="wa-err"></div>
+    <div class="w-act"><button class="w-no" id="wa-cancel">Cancel</button><button class="w-go" id="wa-save">Save &amp; open WhatsApp</button></div>
+  </div>
+</div>
 <div id="srch" role="dialog" aria-label="Search">
   <div class="s-box">
     <div class="s-top"><span>🔍</span><input id="s-in" type="search" placeholder="Search a word… e.g. locker, printer, Okta" autocomplete="off"><button id="s-x">Esc</button></div>
@@ -1775,6 +1802,30 @@ document.addEventListener('keydown',function(e){
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();S.classList.contains('open')?close():open()}
   else if(e.key==='Escape'&&S.classList.contains('open'))close();
 });
+})();
+</script>
+<script>
+(function(){
+var WA_NUMBER='639995204640';   // set a fixed number here, e.g. '639171234567'
+var MSG='Hi, I need help with the APMP Handover Notes.';
+var a=document.getElementById('wa-fab'),pop=document.getElementById('wa-pop'),inp=document.getElementById('wa-num'),err=document.getElementById('wa-err');
+function stored(){try{return localStorage.getItem('apmp_wa_number')||''}catch(e){return ''}}
+function num(){return (WA_NUMBER||stored()).replace(/\D/g,'')}
+function link(n){return 'https://wa.me/'+n+'?text='+encodeURIComponent(MSG)}
+function sync(){var n=num();a.href=n?link(n):'#'}
+a.addEventListener('click',function(e){if(!num()){e.preventDefault();err.textContent='';pop.classList.add('open');inp.focus()}});
+document.getElementById('wa-cancel').onclick=function(){pop.classList.remove('open')};
+pop.addEventListener('mousedown',function(e){if(e.target===pop)pop.classList.remove('open')});
+function save(){
+  var n=inp.value.replace(/\D/g,'');
+  if(n.length<8){err.textContent='Please enter a valid number with country code.';return}
+  try{localStorage.setItem('apmp_wa_number',n)}catch(e){}
+  pop.classList.remove('open');window.open(link(n),'_blank','noopener');
+  a.href=link(n);
+}
+document.getElementById('wa-save').onclick=save;
+inp.addEventListener('keydown',function(e){if(e.key==='Enter')save();if(e.key==='Escape')pop.classList.remove('open')});
+sync();
 })();
 </script>
 </body>
