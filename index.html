@@ -467,6 +467,12 @@ body.view-compact .fl-btn,body.view-compact .task-photo-wrap,body.view-compact .
 body.view-compact .section{margin-bottom:18px!important}
 body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important}
 </style>
+<style>
+#fab-row{flex-direction:column;align-items:center;gap:10px;right:14px;flex-wrap:nowrap;max-width:none}
+#wa-fab,#ax-fab,#srch-fab{width:46px;height:46px;padding:0;border-radius:50%;justify-content:center;align-items:center;font-size:20px;line-height:1;opacity:.95}
+#ax-fab{background:#fff;border:1px solid #DCE6EF}
+#ax-pop{right:72px;bottom:max(14px,env(safe-area-inset-bottom,0px));max-width:calc(100vw - 92px)}
+</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -1834,9 +1840,9 @@ document.body.style.overflow='hidden';
 })();
 </script>
 <div id="fab-row">
-  <a id="wa-fab" href="#" target="_blank" rel="noopener" title="Get help on WhatsApp">💬 Help</a>
-  <button id="ax-fab" aria-label="Views and accessibility options" aria-expanded="false" title="Views &amp; accessibility">👁️ Views</button>
-  <button id="srch-fab" aria-label="Search the handover notes">🔍 Search <kbd>Ctrl K</kbd></button>
+  <a id="wa-fab" href="#" target="_blank" rel="noopener" title="Help on WhatsApp" aria-label="Help on WhatsApp"><span aria-hidden="true">💬</span></a>
+  <button id="ax-fab" aria-label="Views and accessibility options" aria-expanded="false" title="Views &amp; accessibility"><span aria-hidden="true">👁️</span></button>
+  <button id="srch-fab" aria-label="Search the handover notes" title="Search (Ctrl K)"><span aria-hidden="true">🔍</span></button>
 </div>
 <div id="ax-pop" role="dialog" aria-label="Accessibility options">
   <h4>👁️ Views &amp; accessibility</h4>
@@ -2176,6 +2182,18 @@ function label(){
 label();
 var nav=document.querySelector('nav.toc');
 if(nav&&window.MutationObserver){var mo=new MutationObserver(function(){mo.disconnect();label();mo.observe(nav,{childList:true,subtree:true})});mo.observe(nav,{childList:true,subtree:true})}
+})();
+</script>
+<script>
+(function(){
+var pop=document.getElementById('ax-pop'),fab=document.getElementById('ax-fab');
+function out(e){
+  if(!pop.classList.contains('open'))return;
+  if(pop.contains(e.target)||fab.contains(e.target))return;
+  pop.classList.remove('open');fab.setAttribute('aria-expanded','false');
+}
+document.addEventListener('mousedown',out);
+document.addEventListener('touchstart',out,{passive:true});
 })();
 </script>
 </body>
