@@ -499,6 +499,13 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
 <style>body.ship-blank .ship-only{display:none!important}</style>
 <style>.extra-entry .fl-row{margin-top:10px}.extra-entry{padding-bottom:12px}</style>
 <style>.extra-general{padding:14px 16px;border-top:1px solid var(--border)}.eg-title{font:700 11px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:8px}</style>
+<style>
+body:not(.edit-on) :is(.fl-btn,.fl-form,.fl-in,.btn-attach,.btn-chk-photo,.drag-handle,.task-edit-btn,.fl-px,.btn-add,.btn-remove,.att-drop,.att-link,.att-edit,.fl-chip>b,#notes-empty){display:none!important}
+body:not(.edit-on) .fl-row:not(:has(.fl-chip,.fl-path)){display:none!important}
+body:not(.edit-on) .extra-general:not(:has(.fl-chip,.fl-path)){display:none!important}
+body:not(.edit-on) .fl-chip{cursor:pointer}
+#ax-pop #ax-ed{margin-bottom:12px}
+</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -1881,6 +1888,8 @@ document.body.style.overflow='hidden';
     <button data-v="grid" aria-pressed="false">▦ Grid cards</button>
     <button data-v="compact" aria-pressed="false">☰ Compact list</button>
   </div>
+  <h5>Editing</h5>
+  <button id="ax-ed" aria-pressed="false">✏️ Edit mode — show add / edit buttons</button>
   <h5>Accessibility</h5>
   <div class="row"><button id="ax-dn" aria-label="Smaller text">A−</button><button id="ax-up" aria-label="Larger text">A+</button></div>
   <button id="ax-hc" aria-pressed="false">High contrast</button>
@@ -2068,7 +2077,7 @@ function shrink(file,cb){var fr=new FileReader();fr.onload=function(){var im=new
 function setTh(th,src,fallback){th.innerHTML='';if(src){var im=document.createElement('img');im.src=src;im.alt='';th.appendChild(im)}else th.textContent=fallback}
 function render(){
   grid.innerHTML='';
-  if(!items.length){grid.appendChild(mk('div','att-empty','No attachments yet — drop a file or paste a link above.'));return}
+  if(!items.length){grid.appendChild(mk('div','att-empty','No attachments yet.'));return}
   items.forEach(function(it,i){
     var c=mk('div','att-card rv in'),th=mk('div','att-th');
     var own=it.type==='file'&&/^data:image/.test(it.data)?it.data:'';
@@ -2099,9 +2108,9 @@ function render(){
       var host='';if(it.type==='link'){try{host=new URL(it.url).hostname}catch(e){}}
       bd.appendChild(mk('div','att-mt',it.type==='link'?host:sz(it.size)));
       var o=mk('button',null,'Open');o.onclick=function(){openItem(it)};ac.appendChild(o);
-      var ed=mk('button',null,'✏️ Edit');ed.setAttribute('aria-label','Edit '+it.name);ed.onclick=function(){editing=i;render()};ac.appendChild(ed);
+      var ed=mk('button','att-edit','✏️ Edit');ed.setAttribute('aria-label','Edit '+it.name);ed.onclick=function(){editing=i;render()};ac.appendChild(ed);
       if(it.type==='file'){var d=mk('button',null,'Download');d.onclick=function(){var a=document.createElement('a');a.href=it.data;a.download=it.name;a.click()};ac.appendChild(d)}
-      var r=mk('button',null,'Remove');r.setAttribute('aria-label','Remove '+it.name);r.onclick=function(){if(confirm('Remove "'+it.name+'"?')){items.splice(i,1);asave();render()}};ac.appendChild(r);
+      var r=mk('button','att-edit','Remove');r.setAttribute('aria-label','Remove '+it.name);r.onclick=function(){if(confirm('Remove "'+it.name+'"?')){items.splice(i,1);asave();render()}};ac.appendChild(r);
     }
     c.append(th,bd,ac);grid.appendChild(c);
   });
@@ -2289,6 +2298,15 @@ function apply(){
 }
 var rp=window.renderPage;
 if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);apply();return r};
+apply();
+})();
+</script>
+<script>
+(function(){
+var K='apmp_edit_v1',on=false,B=document.body,b=document.getElementById('ax-ed');
+try{on=localStorage.getItem(K)==='1'}catch(e){}
+function apply(){B.classList.toggle('edit-on',on);b.setAttribute('aria-pressed',on);b.textContent=on?'✏️ Edit mode is ON — tap to finish':'✏️ Edit mode — show add / edit buttons'}
+b.onclick=function(){on=!on;try{localStorage.setItem(K,on?'1':'0')}catch(e){}apply()};
 apply();
 })();
 </script>
