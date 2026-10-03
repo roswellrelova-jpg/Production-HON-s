@@ -496,6 +496,7 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
  .toc .toc-actions .ship-b{max-width:none;white-space:normal}
 }
 </style>
+<style>body.ship-blank .ship-only{display:none!important}</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -682,7 +683,7 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
   <section class="section" id="phones">
     <div class="section-header"><div class="section-icon icon-phone">📞</div><h2 class="section-title">Important Phone Numbers</h2></div>
     <hr class="section-rule">
-    <div class="card" style="margin-bottom:10px;"><div class="card-head">💡 All contacts saved on phone ext. 23871 — press the button to browse.</div></div>
+    <div class="card ship-only" style="margin-bottom:10px;"><div class="card-head">💡 All contacts saved on phone ext. 23871 — press the button to browse.</div></div>
     <div class="phone-list" id="pg-phones"></div>
   </section>
 
@@ -697,7 +698,7 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
   <section class="section" id="hardware">
     <div class="section-header"><div class="section-icon icon-tech">🖨️</div><h2 class="section-title">Software &amp; Hardware</h2></div>
     <hr class="section-rule">
-    <div class="card" style="margin-bottom:16px;">
+    <div class="card ship-only" style="margin-bottom:16px;">
       <div class="card-head">Darkroom Setup</div>
       <div class="card-body" style="font-size:13px;color:var(--slate);">
         All sizes enabled. Tilepix photos → Printer 1. All other sizes → Main 1.<br><br>
@@ -706,7 +707,7 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
       </div>
     </div>
     <div class="hw-grid" id="pg-hw"></div>
-    <div class="card" style="margin-top:16px;">
+    <div class="card ship-only" style="margin-top:16px;">
       <div class="card-head">YubiKey — MFA Device</div>
       <div class="card-body">
         <div class="yubi-card" style="margin-bottom:12px;">
@@ -1560,7 +1561,7 @@ const rep=(d,a,b)=>{if(a&&d.hero)for(const k in d.hero)if(typeof d.hero[k]==='st
 const blank=(name,from)=>{
   let d;
   if(from){d=deepClone(from);d.creds=[];const strip=o=>{delete o.photos;delete o.files};Object.values(d.tasks).flat().forEach(strip);d.checklist.forEach(strip)}
-  else d=Object.assign(deepClone(DEFAULTS),{creds:[],phones:[],tasks:{daily:[],weekly:[],monthly:[]},hw:[],yubi:{sn:'',acct:'',name:''},checklist:[]});
+  else d=Object.assign(deepClone(DEFAULTS),{creds:[],phones:[],tasks:{daily:[],weekly:[],monthly:[]},hw:[],yubi:{sn:'',acct:'',name:''},checklist:[],blank:true});
   return rep(d,(from||DEFAULTS).hero.badgeShip,name);
 };
 window.loadData=function(){DATA=rd(K(active).d,null)||(active==='default'?deepClone(DEFAULTS):blank(nameOf(active)));notes=rd(K(active).n,[])};
@@ -2046,9 +2047,11 @@ if('IntersectionObserver' in window){
   document.querySelectorAll('.section,.card').forEach(function(n){n.classList.add('rv');io.observe(n)});
 }
 // attachments
-var AK='apmp_attachments_v1',items=[];
-try{items=JSON.parse(localStorage.getItem(AK)||'[]')}catch(e){}
-function asave(){try{localStorage.setItem(AK,JSON.stringify(items));return true}catch(e){alert('Browser storage is full. Remove a file or add a link instead.');return false}}
+function akey(){var a='default';try{a=localStorage.getItem('apmp_active')||'default'}catch(e){}return 'apmp_attachments_v1'+(a==='default'?'':':'+a)}
+var items=[];
+function aload(){items=[];try{items=JSON.parse(localStorage.getItem(akey())||'[]')}catch(e){}}
+aload();
+function asave(){try{localStorage.setItem(akey(),JSON.stringify(items));return true}catch(e){alert('Browser storage is full. Remove a file or add a link instead.');return false}}
 var grid=document.getElementById('att-grid');
 function icon(n){var x=(n.split('.').pop()||'').toLowerCase();return /^(pdf)$/.test(x)?'📕':/^(xls|xlsx|csv)$/.test(x)?'📊':/^(doc|docx|txt)$/.test(x)?'📝':/^(ppt|pptx)$/.test(x)?'📽️':/^(zip|rar)$/.test(x)?'🗜️':'📎'}
 function sz(b){return b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB'}
@@ -2118,6 +2121,8 @@ document.getElementById('att-add').onclick=function(){
 };
 document.getElementById('att-url').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('att-add').click()});
 render();
+var _ld=window.loadData;
+if(typeof _ld==='function')window.loadData=function(){var r=_ld.apply(this,arguments);editing=-1;aload();render();return r};
 })();
 </script>
 <script>
@@ -2267,6 +2272,21 @@ if(nav){
     document.addEventListener('keydown',function(e){if(e.key==='Escape'&&nav.classList.contains('open'))set(false)});
   }
 }
+})();
+</script>
+<script>
+(function(){
+function act(){try{return localStorage.getItem('apmp_active')||'default'}catch(e){return 'default'}}
+function apply(){
+  if(typeof DATA==='undefined')return;
+  var t=DATA.tasks||{};
+  var empty=!(DATA.phones||[]).length&&!(DATA.hw||[]).length&&!(DATA.checklist||[]).length&&!((t.daily||[]).length+(t.weekly||[]).length+(t.monthly||[]).length);
+  if(DATA.blank===undefined&&act()!=='default'&&empty){DATA.blank=true;if(window.saveData)window.saveData()}
+  document.body.classList.toggle('ship-blank',DATA.blank===true&&act()!=='default');
+}
+var rp=window.renderPage;
+if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);apply();return r};
+apply();
 })();
 </script>
 </body>
