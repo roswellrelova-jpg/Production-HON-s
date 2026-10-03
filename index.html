@@ -497,6 +497,8 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
 }
 </style>
 <style>body.ship-blank .ship-only{display:none!important}</style>
+<style>.extra-entry .fl-row{margin-top:10px}.extra-entry{padding-bottom:12px}</style>
+<style>.extra-general{padding:14px 16px;border-top:1px solid var(--border)}.eg-title{font:700 11px Inter,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin-bottom:8px}</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -745,6 +747,7 @@ body.view-compact .hero{padding-top:18px!important;padding-bottom:18px!important
           No notes yet. Click <strong>+ Add Note</strong> to add one.
         </div>
       </div>
+      <div class="extra-general" id="extra-general"><div class="eg-title">Files, links &amp; paths for this section</div></div>
       <div class="save-notice">
         <span class="save-status" id="notes-status">Notes auto-saved in browser.</span>
         <button class="btn-save" onclick="exportNotes()">Export Notes</button>
@@ -1560,7 +1563,7 @@ const rd=(k,f)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):f}ca
 const rep=(d,a,b)=>{if(a&&d.hero)for(const k in d.hero)if(typeof d.hero[k]==='string')d.hero[k]=d.hero[k].split(a).join(b);return d};
 const blank=(name,from)=>{
   let d;
-  if(from){d=deepClone(from);d.creds=[];const strip=o=>{delete o.photos;delete o.files};Object.values(d.tasks).flat().forEach(strip);d.checklist.forEach(strip)}
+  if(from){d=deepClone(from);d.creds=[];delete d.extra;const strip=o=>{delete o.photos;delete o.files};Object.values(d.tasks).flat().forEach(strip);d.checklist.forEach(strip)}
   else d=Object.assign(deepClone(DEFAULTS),{creds:[],phones:[],tasks:{daily:[],weekly:[],monthly:[]},hw:[],yubi:{sn:'',acct:'',name:''},checklist:[],blank:true});
   return rep(d,(from||DEFAULTS).hero.badgeShip,name);
 };
@@ -1666,7 +1669,7 @@ const saveMeta=()=>{try{localStorage.setItem('apmp_meta',JSON.stringify(META))}c
 const fp=s=>{let h=0;for(let i=0;i<s.length;i+=37)h=(h*31+s.charCodeAt(i))|0;return s.length+':'+h};
 const md=s=>META[fp(s)]||(META[fp(s)]={cap:'',pins:[]});
 const _ci=window.compressImage;window.compressImage=f=>_ci(f,800,800,.6);
-function objOf(x){const hw=x.closest('.hw-item');if(hw)return DATA.hw[+hw.dataset.idx];const t=x.closest('.task-item');if(t)return (DATA.tasks[t.dataset.type]||[])[+t.dataset.idx];const c=x.closest('.check-item');if(c)return DATA.checklist[+c.id.replace('chk-item-','')]}
+function objOf(x){if(x.closest('.extra-general')){DATA.extra=DATA.extra||{};return DATA.extra}const ne=x.closest('.extra-entry');if(ne)return notes[[...ne.parentNode.querySelectorAll(':scope>.extra-entry')].indexOf(ne)];const hw=x.closest('.hw-item');if(hw)return DATA.hw[+hw.dataset.idx];const t=x.closest('.task-item');if(t)return (DATA.tasks[t.dataset.type]||[])[+t.dataset.idx];const c=x.closest('.check-item');if(c)return DATA.checklist[+c.id.replace('chk-item-','')]}
 // ---- IndexedDB for attachments
 const idb=new Promise(r=>{try{const q=indexedDB.open('apmp_files',1);q.onupgradeneeded=()=>q.result.createObjectStore('f');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}});
 const tx=async(mode,fn)=>{const d=await idb;if(!d)throw 0;return new Promise((res,rej)=>{const rq=fn(d.transaction('f',mode).objectStore('f'));rq.onsuccess=()=>res(rq.result);rq.onerror=()=>rej()})};window.__tx=tx;
@@ -1718,7 +1721,7 @@ function paint(row){
   const fm=el('div','fl-form');const t=el('input');t.placeholder='Name (e.g. Location, Website)';t.className='lt';const u=el('input');u.placeholder='https://…';u.className='lu';const s=el('button','fl-btn','Add');s.dataset.a='sl';fm.append(t,u,s);
   row.append(b1,b2,b3,inp,fm,pm);
 }
-function enh(){caps();document.querySelectorAll('.task-item .task-body,.check-item .chk-body,.hw-item .hw-body').forEach(b=>{if(!b.querySelector(':scope>.fl-row')){const r=el('div','fl-row');b.append(r);paint(r)}})}
+function enh(){caps();document.querySelectorAll('.task-item .task-body,.check-item .chk-body,.hw-item .hw-body,.extra-entry,.extra-general').forEach(b=>{if(!b.querySelector(':scope>.fl-row')){const r=el('div','fl-row');b.append(r);paint(r)}})}
 let tm;new MutationObserver(()=>{clearTimeout(tm);tm=setTimeout(enh,60)}).observe(document.body,{childList:true,subtree:true});
 document.addEventListener('click',async e=>{
   const im=e.target.closest('.task-photo-wrap>img');
@@ -1730,11 +1733,11 @@ document.addEventListener('click',async e=>{
   if(a==='af')row.querySelector('.fl-in').click();
   else if(a==='tl')row.querySelector('.fl-form').classList.toggle('open');
   else if(a==='tp'){const f=row.querySelector('.fp-form');f.classList.toggle('open');if(f.classList.contains('open'))f.querySelector('.pu').focus()}
-  else if(a==='sp'){const v=row.querySelector('.pu').value.trim();if(!v)return;o.path=v;saveData();if(row.closest('.task-item'))renderPage();else paint(row)}
-  else if(a==='dp'){delete o.path;saveData();paint(row)}
-  else if(a==='sl'){const ti=row.querySelector('.lt').value.trim();let u=row.querySelector('.lu').value.trim();if(!u)return;if(!/^https?:\/\//i.test(u))u='https://'+u;(o.links=o.links||[]).push({title:ti||u.replace(/^https?:\/\//,'').slice(0,40),url:u});saveData();paint(row)}
-  else if(a==='dl'){e.preventDefault();o.links.splice(i,1);saveData();paint(row)}
-  else if(a==='df'){e.stopPropagation();try{await tx('readwrite',s=>s.delete(o.files[i].id))}catch(x){}o.files.splice(i,1);saveData();paint(row)}
+  else if(a==='sp'){const v=row.querySelector('.pu').value.trim();if(!v)return;o.path=v;saveData();saveNotes();if(row.closest('.task-item'))renderPage();else paint(row)}
+  else if(a==='dp'){delete o.path;saveData();saveNotes();paint(row)}
+  else if(a==='sl'){const ti=row.querySelector('.lt').value.trim();let u=row.querySelector('.lu').value.trim();if(!u)return;if(!/^https?:\/\//i.test(u))u='https://'+u;(o.links=o.links||[]).push({title:ti||u.replace(/^https?:\/\//,'').slice(0,40),url:u});saveData();saveNotes();paint(row)}
+  else if(a==='dl'){e.preventDefault();o.links.splice(i,1);saveData();saveNotes();paint(row)}
+  else if(a==='df'){e.stopPropagation();try{await tx('readwrite',s=>s.delete(o.files[i].id))}catch(x){}o.files.splice(i,1);saveData();saveNotes();paint(row)}
   else if(a==='of'){try{const b=await tx('readonly',s=>s.get(o.files[i].id));if(!b)return alert('File data not found on this device.');const w=window.open(URL.createObjectURL(b),'_blank');if(!w)await save(o.files[i].name,b)}catch(x){alert('Could not open file.')}}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches&&e.target.matches('.fl-row .pu')){e.preventDefault();e.target.closest('.fl-row').querySelector('[data-a=sp]').click()}});
@@ -1745,7 +1748,7 @@ document.addEventListener('change',async e=>{
     const id='f'+Date.now()+Math.random().toString(36).slice(2,7);
     try{await tx('readwrite',s=>s.put(f,id));(o.files=o.files||[]).push({id,name:f.name,size:f.size,type:f.type})}catch(x){alert('This browser blocked file storage.')}
   }
-  saveData();paint(row);e.target.value='';
+  saveData();saveNotes();paint(row);e.target.value='';
 });
 // ---- Save helper + package export/import
 async function save(name,data){
@@ -1755,10 +1758,10 @@ async function save(name,data){
 window.exportNotes=function(){
   if(!notes.length)return alert('No notes to export.');
   let t='APMP HANDOVER — ADDITIONAL NOTES\n'+'='.repeat(40)+'\n\n';
-  notes.forEach((n,i)=>{t+='['+(i+1)+'] '+(n.title||'(Untitled)')+'\n'+'-'.repeat(30)+'\n'+(n.body||'')+'\n\n'});
+  notes.forEach((n,i)=>{t+='['+(i+1)+'] '+(n.title||'(Untitled)')+'\n'+'-'.repeat(30)+'\n'+(n.body||'')+'\n'+(n.path?'Path: '+n.path+'\n':'')+(n.links||[]).map(l=>'Link: '+l.title+' — '+l.url+'\n').join('')+'\n'});
   save('APMP_Additional_Notes.txt',t);
 };
-const objs=()=>[...Object.values(DATA.tasks).flat(),...DATA.checklist];
+const objs=()=>[...Object.values(DATA.tasks).flat(),...DATA.checklist,...DATA.hw,...notes,...(DATA.extra?[DATA.extra]:[])];
 const toUrl=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
 const toBlob=u=>{const [h,b]=u.split(',');const s=atob(b),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return new Blob([a],{type:h.slice(5).split(';')[0]})};
 async function exportPkg(){
