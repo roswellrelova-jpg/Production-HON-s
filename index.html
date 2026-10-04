@@ -2544,11 +2544,7 @@ function render(){
   var idx=L.map(function(m,i){return i});
   function rank(m){var k=ROLES.indexOf(m.role);return k<0?99:k}
   idx.sort(function(a,b){return rank(L[a])-rank(L[b])||(L[a].name||'').localeCompare(L[b].name||'')});
-  var last='';
-  idx.forEach(function(i){var m=L[i],g=grp(m);
-    if(g!==last){last=g;var n=idx.filter(function(j){return grp(L[j])===g}).length,h=E('div','tm-gh');h.appendChild(E('span',null,g));h.appendChild(E('em',null,String(n)));grid.appendChild(h)}
-    grid.appendChild(editing===i?form(m,i,false):card(m,i));
-  });
+  idx.forEach(function(i){var m=L[i];grid.appendChild(editing===i?form(m,i,false):card(m,i))});
 }
 var dl=document.createElement('datalist');dl.id='tm-roles';ROLES.forEach(function(r){var o=document.createElement('option');o.value=r;dl.appendChild(o)});document.body.appendChild(dl);
 document.getElementById('tm-add').onclick=function(){editing=-2;render();var f=grid.querySelector('input');if(f)f.focus()};
