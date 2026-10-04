@@ -567,6 +567,21 @@ body:not(.edit-on) #lb-c{pointer-events:none}
 body:not(.edit-on) .tm-ed{display:none!important}
 </style>
 <style>.tm-gh{grid-column:1/-1;display:flex;align-items:center;gap:10px;font:700 12px Inter,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--slate);margin-top:10px;border-bottom:1px solid var(--border);padding-bottom:8px}.tm-gh em{font-style:normal;background:var(--sky);color:var(--teal);border-radius:12px;padding:2px 9px}.tm-gh:first-child{margin-top:0}.tm-form select{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:10px;font:500 14px Inter,sans-serif;color:var(--navy);background:#fff}</style>
+<style>
+.tm-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.tm-bar .tm-toolbar{margin:0}
+.tm-cols{display:inline-flex;align-items:center;gap:6px;font:600 12px Inter,sans-serif;color:var(--slate)}
+.tm-cols button{width:34px;height:32px;border:1px solid var(--border);background:#fff;border-radius:8px;font:700 13px Inter,sans-serif;color:var(--navy);cursor:pointer}
+.tm-cols button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tm-grid{grid-template-columns:repeat(var(--tmc,3),minmax(0,1fr))!important;gap:14px}
+.tm-card:has(.tm-form){grid-column:span 2}
+.tm-grid.c4 .tm-body{padding:8px 12px 12px;gap:7px}
+.tm-grid.c4 .tm-av{margin-left:12px;width:68px;height:68px;margin-top:-34px;font-size:22px}
+.tm-grid.c4 .tm-name{font-size:15px}.tm-grid.c4 .tm-lock{font-size:12px;padding:6px 10px}
+.tm-grid.c4 .tm-tag{font-size:11px;padding:3px 8px}.tm-grid.c4 .tm-acts{padding:0 12px 12px}
+@media(max-width:900px){.tm-grid{--tmc:2!important}.tm-cols{display:none}.tm-card:has(.tm-form){grid-column:1/-1}}
+@media(max-width:420px){.tm-grid .tm-body{padding:8px 10px 12px}.tm-grid .tm-av{margin-left:10px;width:60px;height:60px;margin-top:-30px;font-size:20px}.tm-grid .tm-name{font-size:14px}.tm-grid .tm-lock{font-size:11px;padding:5px 8px}.tm-grid .tm-role{font-size:10px}.tm-grid .tm-tag{font-size:10.5px;padding:3px 7px}.tm-grid .tm-acts{padding:0 10px 12px}}
+</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -836,7 +851,7 @@ body:not(.edit-on) .tm-ed{display:none!important}
     <div class="section-header"><div class="section-icon" style="background:#E8F0FE"></div><h2 class="section-title">Photographers — Know Your Team</h2></div>
     <hr class="section-rule">
     <p class="tm-intro">Who is who in the team — locker numbers, where they work, and what each person is best at.</p>
-    <div class="tm-toolbar tm-ed"><button type="button" class="tm-addbtn" id="tm-add">+ Add photographer</button></div>
+    <div class="tm-bar"><div class="tm-cols" role="group" aria-label="Photographers per row"><span>Per row</span><button type="button" data-c="3" aria-pressed="true">3</button><button type="button" data-c="4" aria-pressed="false">4</button></div><div class="tm-toolbar tm-ed"><button type="button" class="tm-addbtn" id="tm-add">+ Add photographer</button></div></div>
     <div class="tm-grid" id="tm-grid"></div>
   </section>
 </main>
@@ -2539,6 +2554,17 @@ var dl=document.createElement('datalist');dl.id='tm-roles';ROLES.forEach(functio
 document.getElementById('tm-add').onclick=function(){editing=-2;render();var f=grid.querySelector('input');if(f)f.focus()};
 var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);editing=-1;render();return r};
 render();
+})();
+</script>
+<script>
+(function(){
+var g=document.getElementById('tm-grid'),K='apmp_tm_cols',n=3;
+try{n=+localStorage.getItem(K)||3}catch(e){}
+if(n!==3&&n!==4)n=3;
+var bs=document.querySelectorAll('.tm-cols button');
+function apply(){g.style.setProperty('--tmc',n);g.classList.toggle('c4',n===4);bs.forEach(function(b){b.setAttribute('aria-pressed',+b.dataset.c===n)})}
+bs.forEach(function(b){b.onclick=function(){n=+b.dataset.c;try{localStorage.setItem(K,n)}catch(e){}apply()}});
+apply();
 })();
 </script>
 </body>
