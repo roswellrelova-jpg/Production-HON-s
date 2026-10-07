@@ -614,6 +614,22 @@ body:not(.edit-on) .tm-ed{display:none!important}
 </style>
 <style>.yubi-field span:empty::after{content:"—";color:#9AA9B8}.yubi-edit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}.yubi-edit input{min-width:0;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:500 13px Inter,sans-serif;color:var(--navy)}@media(max-width:600px){.yubi-edit{grid-template-columns:1fr}}</style>
 <style>#hardware.yb-off #yubi-card{display:none!important}#hardware:not(.yb-off) #yubi-add{display:none!important}.yb-add{width:100%;margin-top:16px;border:2px dashed var(--border);background:#fff;border-radius:14px;padding:16px;font:600 14px Inter,sans-serif;color:var(--teal);cursor:pointer}.yb-add small{color:var(--slate);font-weight:500}.yb-btn{border:1px solid var(--border);background:#FDECEA;color:#C0392B;border-radius:8px;padding:8px 12px;font:600 12px Inter,sans-serif;cursor:pointer}@media print{#yubi-add{display:none!important}}</style>
+<style>
+.stamp{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px 18px;margin-bottom:22px}
+.st-l{display:flex;flex-direction:column;gap:3px;min-width:0}
+.st-lb{font:700 11px Inter,sans-serif;letter-spacing:.09em;text-transform:uppercase;color:var(--slate)}
+.st-l strong{font:700 16px Inter,sans-serif;color:var(--navy)}
+.st-sub{font:500 12px Inter,sans-serif;color:#6B7F95}
+.st-r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;border:0;background:#0A1628;border-radius:14px;padding:10px 16px;cursor:pointer;color:#fff}
+.st-clock{font:500 26px/1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.06em;color:#7CF5C4;text-shadow:0 0 10px rgba(124,245,196,.45);font-variant-numeric:tabular-nums}
+.st-date{font:500 11px Inter,sans-serif;color:rgba(255,255,255,.65)}
+.st-print{display:none}
+@media(max-width:560px){.st-r{width:100%;align-items:center}.stamp{padding:12px}}
+@media print{
+ .st-r{display:none!important}.stamp{border:0;padding:0 0 10px;margin-bottom:10px;border-bottom:1px solid #ccc;border-radius:0}
+ .st-print{display:block;position:fixed;left:0;right:0;bottom:0;text-align:center;font:500 10px Inter,sans-serif;color:#444;border-top:1px solid #ccc;padding:4px 0;background:#fff}
+}
+</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -792,6 +808,11 @@ body:not(.edit-on) .tm-ed{display:none!important}
 </nav>
 
 <main class="main">
+  <div class="stamp" id="stamp">
+    <div class="st-l"><span class="st-lb">Last updated</span><strong id="st-upd">Not recorded yet</strong><span class="st-sub" id="st-ago"></span></div>
+    <button type="button" class="st-r" id="st-clockbtn" title="Tap to switch 12-hour / 24-hour"><span class="st-clock" id="st-clock">--:--:--</span><span class="st-date" id="st-date"></span></button>
+  </div>
+  <div class="st-print" id="st-print"></div>
 
   <section class="section" id="credentials">
     <div class="section-header"><div class="section-icon icon-cred">🔐</div><h2 class="section-title">Credentials</h2></div>
@@ -2227,7 +2248,7 @@ function akey(){var a='default';try{a=localStorage.getItem('apmp_active')||'defa
 var items=[];
 function aload(){items=[];try{items=JSON.parse(localStorage.getItem(akey())||'[]')}catch(e){}}
 aload();
-function asave(){try{localStorage.setItem(akey(),JSON.stringify(items));return true}catch(e){alert('Browser storage is full. Remove a file or add a link instead.');return false}}
+function asave(){try{localStorage.setItem(akey(),JSON.stringify(items));try{window.__touch&&window.__touch()}catch(e){}return true}catch(e){alert('Browser storage is full. Remove a file or add a link instead.');return false}}
 var grid=document.getElementById('att-grid');
 function icon(n){var x=(n.split('.').pop()||'').toLowerCase();return /^(pdf)$/.test(x)?'📕':/^(xls|xlsx|csv)$/.test(x)?'📊':/^(doc|docx|txt)$/.test(x)?'📝':/^(ppt|pptx)$/.test(x)?'📽️':/^(zip|rar)$/.test(x)?'🗜️':'📎'}
 function sz(b){return b>1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB'}
@@ -2694,6 +2715,34 @@ document.getElementById('yb-rm').onclick=function(){if(confirm('Remove the YubiK
 document.getElementById('yubi-add').onclick=function(){set(true)};
 var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);apply();return r};
 apply();
+})();
+</script>
+<script>
+(function(){
+var H24=false;try{H24=localStorage.getItem('apmp_clock24')==='1'}catch(e){}
+var upd=document.getElementById('st-upd'),ago=document.getElementById('st-ago'),clk=document.getElementById('st-clock'),dt=document.getElementById('st-date'),pr=document.getElementById('st-print');
+function fmtU(iso){try{return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}catch(e){return iso}}
+function rel(iso){var m=Math.floor((Date.now()-new Date(iso))/60000);if(m<1)return 'just now';if(m<60)return m+' min ago';var h=Math.floor(m/60);if(h<24)return h+' hr ago';var d=Math.floor(h/24);return d+(d===1?' day ago':' days ago')}
+function paint(){
+  var u=(typeof DATA!=='undefined'&&DATA.updated)||'';
+  upd.textContent=u?fmtU(u):'Not recorded yet';ago.textContent=u?rel(u):'It will be recorded the next time something is changed.';
+  pr.textContent='Last updated: '+(u?fmtU(u):'not recorded')+'   ·   Printed: '+fmtU(new Date().toISOString());
+}
+function tick(){
+  var n=new Date();
+  clk.textContent=n.toLocaleTimeString('en-US',{hour:H24?'2-digit':'numeric',minute:'2-digit',second:'2-digit',hour12:!H24});
+  dt.textContent=n.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  if(n.getSeconds()===0)paint();
+}
+document.getElementById('st-clockbtn').onclick=function(){H24=!H24;try{localStorage.setItem('apmp_clock24',H24?'1':'0')}catch(e){}tick()};
+window.__touch=function(){if(typeof DATA==='undefined')return;DATA.updated=new Date().toISOString();if(window.__sd)window.__sd();paint()};
+var sd=window.saveData;
+if(typeof sd==='function'){window.__sd=sd;window.saveData=function(){if(typeof DATA!=='undefined')DATA.updated=new Date().toISOString();var r=sd.apply(this,arguments);paint();return r}}
+var sn=window.saveNotes;
+if(typeof sn==='function')window.saveNotes=function(){var r=sn.apply(this,arguments);if(typeof DATA!=='undefined'){DATA.updated=new Date().toISOString();if(window.__sd)window.__sd();paint()}return r};
+var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);paint();return r};
+window.addEventListener('beforeprint',paint);
+paint();tick();setInterval(tick,1000);
 })();
 </script>
 </body>
