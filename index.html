@@ -582,6 +582,38 @@ body:not(.edit-on) .tm-ed{display:none!important}
 @media(max-width:900px){.tm-grid{--tmc:2!important}.tm-cols{display:none}.tm-card:has(.tm-form){grid-column:1/-1}}
 @media(max-width:420px){.tm-grid .tm-body{padding:8px 10px 12px}.tm-grid .tm-av{margin-left:10px;width:60px;height:60px;margin-top:-30px;font-size:20px}.tm-grid .tm-name{font-size:14px}.tm-grid .tm-lock{font-size:11px;padding:5px 8px}.tm-grid .tm-role{font-size:10px}.tm-grid .tm-tag{font-size:10.5px;padding:3px 7px}.tm-grid .tm-acts{padding:0 10px 12px}}
 </style>
+<style>
+.td-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+@media(max-width:800px){.td-cols{grid-template-columns:1fr}}
+.td-col{background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;min-width:0}
+.td-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.td-head h3{font:700 14px Inter,sans-serif;color:var(--navy);margin:0}
+.td-head em{font-style:normal;background:var(--sky);color:var(--teal);border-radius:12px;padding:2px 9px;font:700 12px Inter,sans-serif}
+.td-head .td-add{margin-left:auto;border:0;background:var(--teal);color:#fff;border-radius:8px;padding:7px 12px;font:600 12px Inter,sans-serif;cursor:pointer}
+.td-card{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--border);border-left:4px solid var(--pc,#9AA9B8);border-radius:12px;padding:11px 12px;margin-bottom:9px;background:#fff;transition:box-shadow .2s}
+.td-card:hover{box-shadow:0 6px 18px rgba(10,22,40,.08)}
+.td-card.done{opacity:.55}.td-card.done .td-title{text-decoration:line-through}
+.td-chk{flex:0 0 24px;width:24px;height:24px;border-radius:50%;border:2px solid #9AA9B8;background:#fff;cursor:pointer;color:#fff;font:700 13px/1 Inter,sans-serif;padding:0;margin-top:1px}
+.td-card.done .td-chk{background:#188038;border-color:#188038}
+.td-main{flex:1;min-width:0}
+.td-title{font:600 14px/1.35 Inter,sans-serif;color:var(--navy);overflow-wrap:anywhere}
+.td-note{font:400 12.5px/1.5 Inter,sans-serif;color:var(--slate);margin-top:3px;white-space:pre-wrap;overflow-wrap:anywhere}
+.td-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.td-chip{font:600 11px Inter,sans-serif;border-radius:20px;padding:3px 9px;background:#EEF4FA;color:#3B5270}
+.td-chip.hi{background:#FDECEA;color:#C0392B}.td-chip.md{background:#FEF3E2;color:#B45F06}.td-chip.lo{background:#EEF4FA;color:#5D6D7E}
+.td-chip.over{background:#C0392B;color:#fff}.td-chip.who{background:#E4F3FA;color:#0B5F82}
+.td-edit{border:0;background:none;cursor:pointer;color:#9AA9B8;font-size:14px;padding:2px 4px}
+.td-empty{text-align:center;color:#6B7F95;font:400 13px Inter,sans-serif;padding:18px 8px;border:2px dashed var(--border);border-radius:12px}
+.td-form{border:1px solid var(--teal);border-radius:12px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:7px;background:#F7FBFD}
+.td-form label{font:600 11px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--slate)}
+.td-form input,.td-form textarea,.td-form select{width:100%;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:500 14px Inter,sans-serif;color:var(--navy);background:#fff}
+.td-form .r2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.td-form .act{display:flex;gap:6px}.td-form .act button{flex:1;border:0;border-radius:8px;padding:10px;font:600 13px Inter,sans-serif;cursor:pointer;background:#EEF4FA;color:#3B5270}
+.td-form .act .go{background:var(--teal);color:#fff}.td-form .act .del{background:#FDECEA;color:#C0392B}
+.td-done-d summary{cursor:pointer;font:600 12px Inter,sans-serif;color:var(--slate);margin:6px 0 8px}
+</style>
+<style>.yubi-field span:empty::after{content:"—";color:#9AA9B8}.yubi-edit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}.yubi-edit input{min-width:0;box-sizing:border-box;border:1px solid var(--border);border-radius:8px;padding:9px 10px;font:500 13px Inter,sans-serif;color:var(--navy)}@media(max-width:600px){.yubi-edit{grid-template-columns:1fr}}</style>
+<style>#hardware.yb-off #yubi-card{display:none!important}#hardware:not(.yb-off) #yubi-add{display:none!important}.yb-add{width:100%;margin-top:16px;border:2px dashed var(--border);background:#fff;border-radius:14px;padding:16px;font:600 14px Inter,sans-serif;color:var(--teal);cursor:pointer}.yb-add small{color:var(--slate);font-weight:500}.yb-btn{border:1px solid var(--border);background:#FDECEA;color:#C0392B;border-radius:8px;padding:8px 12px;font:600 12px Inter,sans-serif;cursor:pointer}@media print{#yubi-add{display:none!important}}</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -752,6 +784,7 @@ body:not(.edit-on) .tm-ed{display:none!important}
     <button class="toc-btn" onclick="scrollToSection('extra')">Additional Info</button>
     <button class="toc-btn" onclick="scrollToSection('attach')">Attachments</button>
     <button class="toc-btn" onclick="scrollToSection('team')">Photographers</button>
+    <button class="toc-btn" onclick="scrollToSection('todo')">Offload &amp; Pending</button>
     <div class="toc-divider"></div>
     <button class="toc-btn toc-icon-btn" onclick="openSettings()" title="Edit / Settings">⚙️</button>
     <button class="toc-btn toc-icon-btn" onclick="openPdfModal()" title="Download PDF">📄</button>
@@ -793,7 +826,7 @@ body:not(.edit-on) .tm-ed{display:none!important}
       </div>
     </div>
     <div class="hw-grid" id="pg-hw"></div>
-    <div class="card ship-only" style="margin-top:16px;">
+    <div class="card" id="yubi-card" style="margin-top:16px;">
       <div class="card-head">YubiKey — MFA Device</div>
       <div class="card-body">
         <div class="yubi-card" style="margin-bottom:12px;">
@@ -801,13 +834,20 @@ body:not(.edit-on) .tm-ed{display:none!important}
           <div class="yubi-field"><label>Account</label><span id="pg-yubi-acct">photolab422</span></div>
           <div class="yubi-field"><label>Assigned To</label><span id="pg-yubi-name">AQUA Assistant Photo Manager Production</span></div>
         </div>
+        <div class="yubi-edit tm-ed">
+          <input id="yb-sn" placeholder="Serial No." aria-label="YubiKey serial number">
+          <input id="yb-acct" placeholder="Account" aria-label="YubiKey account">
+          <input id="yb-name" placeholder="Assigned to" aria-label="YubiKey assigned to">
+        </div>
         <p style="font-size:13px;color:var(--slate);margin-bottom:8px;">OKTA login at <a href="https://nclh.okta.com/" style="color:var(--teal);" target="_blank" rel="noopener">https://nclh.okta.com/</a></p>
         <ol style="font-size:13px;color:var(--slate);padding-left:18px;line-height:1.7;">
           <li>Enter Windows credentials (username &amp; password)</li>
           <li>MFA step — insert then tap YubiKey</li>
         </ol>
+        <div class="tm-ed" style="margin-top:12px"><button type="button" id="yb-rm" class="yb-btn">Remove this card from the page</button></div>
       </div>
     </div>
+    <button type="button" id="yubi-add" class="tm-ed yb-add">+ Add YubiKey — MFA Device <small>(optional)</small></button>
   </section>
 
   <section class="section" id="checklist">
@@ -853,6 +893,15 @@ body:not(.edit-on) .tm-ed{display:none!important}
     <p class="tm-intro">Who is who in the team — locker numbers, where they work, and what each person is best at.</p>
     <div class="tm-bar"><div class="tm-cols" role="group" aria-label="Photographers per row"><span>Per row</span><button type="button" data-c="3" aria-pressed="true">3</button><button type="button" data-c="4" aria-pressed="false">4</button></div><div class="tm-toolbar tm-ed"><button type="button" class="tm-addbtn" id="tm-add">+ Add photographer</button></div></div>
     <div class="tm-grid" id="tm-grid"></div>
+  </section>
+  <section class="section" id="todo">
+    <div class="section-header"><div class="section-icon" style="background:#FEF3E2"></div><h2 class="section-title">Offload &amp; Pending Tasks</h2></div>
+    <hr class="section-rule">
+    <p class="tm-intro">Tasks still open, and tasks that were handed over (offloaded) to someone else.</p>
+    <div class="td-cols">
+      <div class="td-col" id="td-pending"></div>
+      <div class="td-col" id="td-offload"></div>
+    </div>
   </section>
 </main>
 <footer class="footer" id="pg-footer">Norwegian Aqua · APMP Handover Reference · Photo Department</footer>
@@ -1685,7 +1734,7 @@ const rd=(k,f)=>{try{const s=localStorage.getItem(k);return s?JSON.parse(s):f}ca
 const rep=(d,a,b)=>{if(a&&d.hero)for(const k in d.hero)if(typeof d.hero[k]==='string')d.hero[k]=d.hero[k].split(a).join(b);return d};
 const blank=(name,from)=>{
   let d;
-  if(from){d=deepClone(from);d.creds=[];delete d.extra;delete d.team;const strip=o=>{delete o.photos;delete o.files};Object.values(d.tasks).flat().forEach(strip);d.checklist.forEach(strip)}
+  if(from){d=deepClone(from);d.creds=[];delete d.extra;delete d.team;delete d.todo;const strip=o=>{delete o.photos;delete o.files};Object.values(d.tasks).flat().forEach(strip);d.checklist.forEach(strip)}
   else d=Object.assign(deepClone(DEFAULTS),{creds:[],phones:[],tasks:{daily:[],weekly:[],monthly:[]},hw:[],yubi:{sn:'',acct:'',name:''},checklist:[],blank:true});
   return rep(d,(from||DEFAULTS).hero.badgeShip,name);
 };
@@ -2032,7 +2081,7 @@ document.body.style.overflow='hidden';
 </div>
 <script>
 (function(){
-var SEL='.cred-item,.phone-item,.task-item,.check-item,.hw-item,.extra-entry,.tm-card,.card';
+var SEL='.cred-item,.phone-item,.task-item,.check-item,.hw-item,.extra-entry,.tm-card,.td-card,.card';
 var S=document.getElementById('srch'),IN=document.getElementById('s-in'),LIST=document.getElementById('s-list'),META=document.getElementById('s-meta');
 var cur=[],sel=0;
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
@@ -2047,14 +2096,14 @@ function textOf(u){
 }
 function titleOf(u){
   if(u.classList.contains('extra-entry')){var i=u.querySelector('input');return (i&&i.value.trim())||'Untitled note'}
-  var t=u.querySelector('.cred-service,.task-title-view,.phone-name,.hw-name,.tm-name,.card-head,.chk-title');
+  var t=u.querySelector('.cred-service,.task-title-view,.phone-name,.hw-name,.tm-name,.td-title,.card-head,.chk-title');
   if(t&&t.textContent.trim())return t.textContent.trim();
   var x=textOf(u);return x.slice(0,50)||'Item';
 }
 function units(){
   var all=Array.prototype.slice.call(document.querySelectorAll('main '+SEL.split(',').join(',main '))||[]);
   if(!all.length)all=Array.prototype.slice.call(document.querySelectorAll(SEL));
-  return all.filter(function(u){return !u.querySelector(SEL)&&u.closest('section')});
+  return all.filter(function(u){return !u.querySelector(SEL)&&u.closest('section')&&!(u.id==='yubi-card'&&u.closest('.yb-off'))});
 }
 function run(q){
   q=q.trim().toLowerCase();LIST.innerHTML='';cur=[];sel=0;
@@ -2153,7 +2202,7 @@ if(nav){
   var inner=nav.querySelector('.toc-inner');
   var br=document.createElement('div');br.className='nv-brand';br.innerHTML='🚢 APMP Handover<small>Norwegian Aqua · Photo Department</small>';
   nav.insertBefore(br,nav.firstChild);
-  var ic=['🔐','📞','🧪','🖥️','✅','📝','📎','👥'];
+  var ic=['🔐','📞','🧪','🖥️','✅','📝','📎','👥','📤'];
   Array.prototype.filter.call(inner.querySelectorAll('.toc-btn'),function(b){return !b.classList.contains('toc-icon-btn')&&!b.closest('.toc-actions')}).forEach(function(b,i){
     if(ic[i]&&!b.querySelector('.nv-i')){var s=document.createElement('span');s.className='nv-i';s.setAttribute('aria-hidden','true');s.textContent=ic[i];b.insertBefore(s,b.firstChild)}
   });
@@ -2362,13 +2411,14 @@ var P={
  extra:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
  attach:'<path d="m21.4 11.1-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
  team:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/>',
+ todo:'<path d="M9 6h12M9 12h12M9 18h12"/><path d="m3 6 1 1 2-2M3 12l1 1 2-2M3 18l1 1 2-2"/>',
  settings:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
  pdf:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
  ex:'<path d="m7.5 4.3 9 5.2M21 8v8a2 2 0 0 1-1 1.7l-7 4a2 2 0 0 1-2 0l-7-4A2 2 0 0 1 3 16V8a2 2 0 0 1 1-1.7l7-4a2 2 0 0 1 2 0l7 4A2 2 0 0 1 21 8z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>',
  im:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>'
 };
 function svg(k){return '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false">'+P[k]+'</svg>'}
-var order=['credentials','phones','lab','hardware','checklist','extra','attach','team'];
+var order=['credentials','phones','lab','hardware','checklist','extra','attach','team','todo'];
 // nav tab icons
 document.querySelectorAll('.nv-i').forEach(function(sp,i){if(order[i])sp.innerHTML=svg(order[i])});
 // section header icons
@@ -2560,6 +2610,89 @@ if(n!==3&&n!==4)n=3;
 var bs=document.querySelectorAll('.tm-cols button');
 function apply(){g.style.setProperty('--tmc',n);g.classList.toggle('c4',n===4);bs.forEach(function(b){b.setAttribute('aria-pressed',+b.dataset.c===n)})}
 bs.forEach(function(b){b.onclick=function(){n=+b.dataset.c;try{localStorage.setItem(K,n)}catch(e){}apply()}});
+apply();
+})();
+</script>
+<script>
+(function(){
+var COLS=[['pending','⏳ Pending Tasks','td-pending','No pending tasks.'],['offload','📤 Offloaded Tasks','td-offload','Nothing offloaded yet.']];
+var PC={high:'#C0392B',med:'#E8710A',low:'#9AA9B8'},PL={high:'High',med:'Medium',low:'Low'},PR={high:0,med:1,low:2};
+var editing=null;
+function E(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function L(){if(typeof DATA==='undefined')return[];DATA.todo=DATA.todo||[];return DATA.todo}
+function save(){if(window.saveData)window.saveData()}
+function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+function fd(s){try{return new Date(s+'T00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}catch(e){return s}}
+function fld(f,lab,el){f.appendChild(E('label',null,lab));f.appendChild(el);return el}
+function card(t){
+  var c=E('div','td-card'+(t.done?' done':''));c.style.setProperty('--pc',PC[t.pri||'low']);
+  var k=E('button','td-chk',t.done?'✓':'');k.type='button';k.setAttribute('aria-label',(t.done?'Mark not done: ':'Mark done: ')+t.title);
+  k.onclick=function(){t.done=!t.done;save();render()};c.appendChild(k);
+  var m=E('div','td-main');m.appendChild(E('div','td-title',t.title));
+  if(t.note)m.appendChild(E('div','td-note',t.note));
+  var meta=E('div','td-meta');
+  if(t.pri)meta.appendChild(E('span','td-chip '+(t.pri==='high'?'hi':t.pri==='med'?'md':'lo'),PL[t.pri]+' priority'));
+  if(t.due){var o=!t.done&&t.due<today();meta.appendChild(E('span','td-chip'+(o?' over':''),(o?'Overdue · ':'Due ')+fd(t.due)))}
+  if(t.who)meta.appendChild(E('span','td-chip who',(t.type==='offload'?'Offloaded to ':'Owner: ')+t.who));
+  if(meta.childNodes.length)m.appendChild(meta);
+  c.appendChild(m);
+  var e=E('button','td-edit tm-ed','✏️');e.type='button';e.setAttribute('aria-label','Edit task');e.onclick=function(){editing=t;render()};c.appendChild(e);
+  return c;
+}
+function form(t,isNew){
+  var f=E('div','td-form');
+  var ti=document.createElement('input');ti.value=t.title||'';ti.placeholder='Task title';fld(f,'Task',ti);
+  var nt=document.createElement('textarea');nt.rows=3;nt.value=t.note||'';nt.placeholder='Details — what is left to do?';fld(f,'Details',nt);
+  var wh=document.createElement('input');wh.value=t.who||'';wh.setAttribute('list','td-team');wh.placeholder=t.type==='offload'?'Offloaded to…':'Owner (optional)';fld(f,t.type==='offload'?'Offloaded to':'Owner',wh);
+  var r=E('div','r2'),a=E('div'),b=E('div');
+  var du=document.createElement('input');du.type='date';du.value=t.due||'';fld(a,'Due date',du);
+  var pr=document.createElement('select');[['','—'],['high','High'],['med','Medium'],['low','Low']].forEach(function(o){var x=document.createElement('option');x.value=o[0];x.textContent=o[1];if((t.pri||'')===o[0])x.selected=true;pr.appendChild(x)});fld(b,'Priority',pr);
+  r.append(a,b);f.appendChild(r);
+  var ac=E('div','act'),sv=E('button','go','Save'),cn=E('button',null,'Cancel');
+  sv.onclick=function(){var v=ti.value.trim();if(!v){ti.focus();return}t.title=v;t.note=nt.value.trim();t.who=wh.value.trim();t.due=du.value;t.pri=pr.value;if(isNew)L().push(t);save();editing=null;render()};
+  cn.onclick=function(){editing=null;render()};ac.append(sv,cn);
+  if(!isNew){var dl=E('button','del','Delete');dl.onclick=function(){if(confirm('Delete this task?')){var i=L().indexOf(t);if(i>-1)L().splice(i,1);save();editing=null;render()}};ac.appendChild(dl)}
+  f.appendChild(ac);return f;
+}
+function render(){
+  var all=L(),names=(typeof DATA!=='undefined'&&DATA.team||[]).map(function(m){return m.name}).filter(Boolean);
+  var dl=document.getElementById('td-team');if(!dl){dl=document.createElement('datalist');dl.id='td-team';document.body.appendChild(dl)}
+  dl.innerHTML='';names.forEach(function(n){var o=document.createElement('option');o.value=n;dl.appendChild(o)});
+  COLS.forEach(function(cfg){
+    var host=document.getElementById(cfg[2]);if(!host)return;host.innerHTML='';
+    var items=all.filter(function(t){return (t.type||'pending')===cfg[0]});
+    var open=items.filter(function(t){return !t.done}).sort(function(a,b){return (PR[a.pri]===undefined?3:PR[a.pri])-(PR[b.pri]===undefined?3:PR[b.pri])||(a.due||'9').localeCompare(b.due||'9')});
+    var done=items.filter(function(t){return t.done});
+    var h=E('div','td-head');h.appendChild(E('h3',null,cfg[1]));h.appendChild(E('em',null,String(open.length)));
+    var ad=E('button','td-add tm-ed','+ Add');ad.type='button';ad.onclick=function(){editing={type:cfg[0],_new:true};render()};h.appendChild(ad);host.appendChild(h);
+    if(editing&&editing._new&&editing.type===cfg[0])host.appendChild(form(editing,true));
+    if(!open.length&&!(editing&&editing._new&&editing.type===cfg[0]))host.appendChild(E('div','td-empty',cfg[3]));
+    open.forEach(function(t){host.appendChild(editing===t?form(t,false):card(t))});
+    if(done.length){var d=E('details','td-done-d');d.appendChild(E('summary',null,'Done ('+done.length+')'));done.forEach(function(t){d.appendChild(editing===t?form(t,false):card(t))});host.appendChild(d)}
+  });
+}
+var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);editing=null;render();return r};
+render();
+})();
+</script>
+<script>
+(function(){
+var M=[['yb-sn','sn','pg-yubi-sn'],['yb-acct','acct','pg-yubi-acct'],['yb-name','name','pg-yubi-name']];
+function fill(){if(typeof DATA==='undefined')return;var y=DATA.yubi||{};M.forEach(function(m){var i=document.getElementById(m[0]);if(i)i.value=y[m[1]]||''})}
+M.forEach(function(m){var i=document.getElementById(m[0]);if(!i)return;i.addEventListener('input',function(){DATA.yubi=DATA.yubi||{};DATA.yubi[m[1]]=i.value.trim();var sp=document.getElementById(m[2]);if(sp)sp.textContent=i.value.trim();if(window.saveData)window.saveData()})});
+var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);fill();return r};
+fill();
+})();
+</script>
+<script>
+(function(){
+var sec=document.getElementById('hardware');
+function on(){if(typeof DATA==='undefined')return true;return DATA.yubiOn!==undefined?!!DATA.yubiOn:DATA.blank!==true}
+function apply(){if(sec)sec.classList.toggle('yb-off',!on())}
+function set(v){DATA.yubiOn=v;if(window.saveData)window.saveData();apply()}
+document.getElementById('yb-rm').onclick=function(){if(confirm('Remove the YubiKey card from this ship? You can add it back anytime in Edit mode.'))set(false)};
+document.getElementById('yubi-add').onclick=function(){set(true)};
+var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);apply();return r};
 apply();
 })();
 </script>
