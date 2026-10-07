@@ -630,6 +630,7 @@ body:not(.edit-on) .tm-ed{display:none!important}
  .st-print{display:block;position:fixed;left:0;right:0;bottom:0;text-align:center;font:500 10px Inter,sans-serif;color:#444;border-top:1px solid #ccc;padding:4px 0;background:#fff}
 }
 </style>
+<style>.pdf-opts{display:flex;flex-direction:column;gap:8px;text-align:left;margin-bottom:12px}.pdf-opts label{font:600 13px Inter,sans-serif;color:var(--navy);display:flex;gap:8px;align-items:center;cursor:pointer}.pdf-warn{background:#FEF3E2;color:#B45F06;border-radius:8px;padding:8px 12px;font:600 12px Inter,sans-serif;margin-bottom:14px;text-align:left}</style>
 </head>
 <body>
 <a class="skip" href="#credentials">Skip to content</a>
@@ -655,10 +656,15 @@ body:not(.edit-on) .tm-ed{display:none!important}
 <div class="pdf-modal-overlay" id="pdfModal">
   <div class="pdf-modal">
     <h3>📄 Save as PDF</h3>
-    <p>Use your browser's built-in Print function to save as PDF. It takes 3 seconds:</p>
+    <p>A clean, formatted handover report is prepared from all sections — then saved as PDF through your browser's print window.</p>
+    <div class="pdf-opts">
+      <label><input type="checkbox" id="pdf-creds" checked> Include credentials</label>
+      <label><input type="checkbox" id="pdf-pass" checked> Show passwords</label>
+    </div>
+    <div class="pdf-warn">⚠️ A PDF with passwords is sensitive — keep the file private.</div>
     <ol class="pdf-steps">
       <li><strong>Click "Open Print Dialog"</strong> below</li>
-      <li>In the dialog, set <strong>Destination → Save as PDF</strong></li>
+      <li>Set <strong>Destination → Save as PDF</strong>, turn on <strong>Background graphics</strong></li>
       <li>Click <strong>Save</strong> — done!</li>
     </ol>
     <div class="pdf-modal-btns">
@@ -2743,6 +2749,96 @@ if(typeof sn==='function')window.saveNotes=function(){var r=sn.apply(this,argume
 var rp=window.renderPage;if(typeof rp==='function')window.renderPage=function(){var r=rp.apply(this,arguments);paint();return r};
 window.addEventListener('beforeprint',paint);
 paint();tick();setInterval(tick,1000);
+})();
+</script>
+<script>
+(function(){
+var E=function(x){return esc(x)},F=function(x){return fmt(x)};
+function fmtU(iso){try{return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'})}catch(e){return iso||''}}
+function lk(x){return (x.links||[]).map(function(l){return '<div class="ref"><span class="rl">Link</span> '+E(l.title)+' — <span class="mono">'+E(l.url)+'</span></div>'}).join('')}
+function pt(x){return x.path?'<div class="ref"><span class="rl">Path</span> <span class="mono">'+E(x.path)+'</span></div>':''}
+function empty(t){return '<p class="none">'+t+'</p>'}
+function akey(){var a='default';try{a=localStorage.getItem('apmp_active')||'default'}catch(e){}return 'apmp_attachments_v1'+(a==='default'?'':':'+a)}
+function build(o){
+  var D=DATA,h=D.hero||{},sec=[],n=0;
+  var blank=document.body.classList.contains('ship-blank');
+  function add(title,body){n++;sec.push({n:n,t:title,b:body})}
+  // 1 credentials
+  if(o.creds){
+    var cr=(D.creds||[]);
+    add('Credentials',cr.length?'<table><thead><tr><th>Service</th><th>Username</th>'+(o.pass?'<th>Password</th>':'')+'<th>Notes</th></tr></thead><tbody>'+cr.map(function(c){return '<tr><td class="b">'+E(c.service)+'</td><td class="mono">'+E(c.user)+'</td>'+(o.pass?'<td class="mono">'+E(c.pass)+'</td>':'')+'<td>'+E(c.note)+'</td></tr>'}).join('')+'</tbody></table>':empty('No credentials recorded.'));
+  }
+  // 2 phones
+  var ph=D.phones||[],hint=document.querySelector('#phones .ship-only .card-head'),hintTxt=(!blank&&hint)?'<div class="callout">'+E(hint.textContent.replace('💡','').trim())+'</div>':'';
+  add('Important Phone Numbers',hintTxt+(ph.length?'<table><thead><tr><th style="width:90px">Ext. / Number</th><th>Name</th><th>Notes</th></tr></thead><tbody>'+ph.map(function(c){return '<tr><td class="mono b">'+(c.urgent?'<span class="urg">●</span> ':'')+E(c.num)+'</td><td class="b">'+E(c.name)+'</td><td>'+E(c.note)+'</td></tr>'}).join('')+'</tbody></table><p class="legend"><span class="urg">●</span> Urgent contact</p>':empty('No phone numbers recorded.')));
+  // 3 lab operations
+  var T=D.tasks||{},lab='';
+  [['daily','Daily'],['weekly','Weekly'],['monthly','Monthly']].forEach(function(g){
+    var a=T[g[0]]||[];if(!a.length)return;
+    lab+='<h3>'+g[1]+' tasks</h3>'+a.map(function(t){return '<div class="task"><h4>'+E(t.title)+'</h4>'+(t.desc?'<div class="desc">'+F(t.desc)+'</div>':'')+pt(t)+lk(t)+'</div>'}).join('');
+  });
+  add('Lab Operations',lab||empty('No lab tasks recorded.'));
+  // 4 hardware
+  var hw=D.hw||[],hwb='';
+  hwb+=hw.length?'<table><thead><tr><th style="width:170px">Device</th><th style="width:80px">ID</th><th>Details</th></tr></thead><tbody>'+hw.map(function(x){return '<tr><td class="b">'+E(x.name)+'</td><td class="mono">'+E(x.id)+'</td><td>'+E(x.detail)+pt(x)+lk(x)+'</td></tr>'}).join('')+'</tbody></table>':empty('No devices recorded.');
+  var dk=document.querySelector('#hardware .card.ship-only .card-body');
+  if(!blank&&dk)hwb+='<div class="box"><h4>Darkroom Setup</h4><p>'+E(dk.textContent.replace(/\s+/g,' ').trim())+'</p></div>';
+  if(!document.getElementById('hardware').classList.contains('yb-off')){var y=D.yubi||{};
+    hwb+='<div class="box"><h4>YubiKey — MFA Device</h4><div class="kv"><div><span>Serial No.</span><b class="mono">'+E(y.sn||'—')+'</b></div><div><span>Account</span><b class="mono">'+E(y.acct||'—')+'</b></div><div><span>Assigned to</span><b>'+E(y.name||'—')+'</b></div></div><p>OKTA login at <span class="mono">https://nclh.okta.com/</span></p><ol><li>Enter Windows credentials (username &amp; password)</li><li>MFA step — insert then tap YubiKey</li></ol></div>';}
+  add('Software &amp; Hardware',hwb);
+  // 5 checklist
+  var ck=D.checklist||[];
+  add('Daily Checklist — Guest Facing Technology','<p class="lead">Photographer checks all areas and reports to the WhatsApp group with a photo.</p>'+(ck.length?'<table><thead><tr><th style="width:26px"></th><th style="width:170px">Item</th><th style="width:90px">Location</th><th>Notes</th></tr></thead><tbody>'+ck.map(function(c){return '<tr><td class="bx">☐</td><td class="b">'+E(c.title)+'</td><td>'+E(c.loc)+'</td><td>'+E(c.note)+pt(c)+lk(c)+'</td></tr>'}).join('')+'</tbody></table>':empty('No checklist items.')));
+  // 6 additional info
+  var nt=(typeof notes!=='undefined'&&notes)||[],ex=D.extra||{};
+  if(nt.length||ex.path||(ex.links||[]).length)add('Additional Information',nt.map(function(x){return '<div class="task"><h4>'+E(x.title||'(Untitled)')+'</h4><div class="desc">'+E(x.body||'')+'</div>'+pt(x)+lk(x)+'</div>'}).join('')+((ex.path||(ex.links||[]).length)?'<div class="task"><h4>Files, links &amp; paths</h4>'+pt(ex)+lk(ex)+'</div>':''));
+  // 7 team
+  var tm=D.team||[];
+  if(tm.length){var ORD=['Photo Manager','Assistant Photo Manager – Sales','Assistant Photo Manager – Production','Senior Photographer','Photographer Level 3','Photographer Level 2','Photographer Level 1'];
+    var ts=tm.slice().sort(function(a,b){var x=ORD.indexOf(a.role),y=ORD.indexOf(b.role);return (x<0?99:x)-(y<0?99:y)||(a.name||'').localeCompare(b.name||'')});
+    add('Photographers — Know Your Team','<table><thead><tr><th>Name</th><th>Position</th><th style="width:60px">Locker</th><th>Assigned to</th><th>Good at</th></tr></thead><tbody>'+ts.map(function(m){return '<tr><td class="b">'+E(m.name)+'</td><td>'+E(m.role)+'</td><td class="b">'+E(m.locker)+'</td><td>'+E(m.venue)+'</td><td>'+E((m.tags||[]).join(', '))+(m.note?'<div class="sm">'+E(m.note)+'</div>':'')+'</td></tr>'}).join('')+'</tbody></table>');}
+  // 8 todo
+  var td=D.todo||[];
+  if(td.length){function tt(type,lab){var a=td.filter(function(t){return (t.type||'pending')===type});if(!a.length)return '';return '<h3>'+lab+'</h3><table><thead><tr><th style="width:26px"></th><th>Task</th><th style="width:90px">Priority</th><th style="width:90px">Due</th><th style="width:120px">'+(type==='offload'?'Offloaded to':'Owner')+'</th></tr></thead><tbody>'+a.map(function(t){return '<tr><td class="bx">'+(t.done?'☑':'☐')+'</td><td><span class="b">'+E(t.title)+'</span>'+(t.note?'<div class="sm">'+E(t.note)+'</div>':'')+'</td><td>'+E({high:'High',med:'Medium',low:'Low'}[t.pri]||'')+'</td><td>'+E(t.due||'')+'</td><td>'+E(t.who||'')+'</td></tr>'}).join('')+'</tbody></table>'}
+    add('Offload &amp; Pending Tasks',tt('pending','Pending')+tt('offload','Offloaded'));}
+  // 9 attachments
+  var at=[];try{at=JSON.parse(localStorage.getItem(akey())||'[]')}catch(e){}
+  if(at.length)add('Attachments','<table><thead><tr><th>Name</th><th>Type</th><th>Details</th></tr></thead><tbody>'+at.map(function(a){return '<tr><td class="b">'+E(a.name)+'</td><td>'+(a.type==='link'?'Link':'File')+'</td><td>'+(a.type==='link'?'<span class="mono">'+E(a.url)+'</span>':'Stored in the handover page')+(a.note?'<div class="sm">'+E(a.note)+'</div>':'')+'</td></tr>'}).join('')+'</tbody></table>');
+  var upd=D.updated?fmtU(D.updated):'not recorded',now=fmtU(new Date().toISOString());
+  var ship=E(h.badgeShip||'Ship'),ttl=E(h.title||'Handover Notes');
+  var css='@page{size:A4;margin:14mm 12mm 18mm;@bottom-right{content:"Page " counter(page) " of " counter(pages);font:8pt Inter,Arial,sans-serif;color:#667}}'+
+  '*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;font:9.5pt/1.5 Inter,"Segoe UI",Arial,sans-serif;color:#142033}'+
+  '.hd{background:linear-gradient(135deg,#0A1628,#0E3A6E 70%,#0B7EA8);color:#fff;border-radius:10px;padding:22px 26px;margin-bottom:14px}.hd .tag{font-size:8pt;letter-spacing:.14em;text-transform:uppercase;opacity:.8}.hd h1{font-size:23pt;margin:6px 0 4px;letter-spacing:-.02em}.hd .sub{font-size:10pt;opacity:.8}'+
+  '.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.meta span{background:rgba(255,255,255,.14);border-radius:20px;padding:3px 11px;font-size:8pt}'+
+  '.info{display:flex;gap:10px;margin-bottom:14px}.info div{flex:1;border:1px solid #DCE6EF;border-radius:8px;padding:8px 12px}.info span{display:block;font-size:7pt;letter-spacing:.09em;text-transform:uppercase;color:#667}.info b{font-size:10pt}'+
+  '.toc{border:1px solid #DCE6EF;border-radius:8px;padding:10px 14px;margin-bottom:6px;columns:2;font-size:9pt}.toc h5{margin:0 0 4px;font-size:7.5pt;letter-spacing:.1em;text-transform:uppercase;color:#667;column-span:all}.toc div{padding:1.5px 0}.toc b{color:#0B7EA8;display:inline-block;width:20px}'+
+  'h2{display:flex;align-items:center;gap:10px;font-size:13pt;margin:20px 0 10px;padding-bottom:6px;border-bottom:2px solid #0A1628;break-after:avoid;color:#0A1628}h2 .no{background:#0A1628;color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:9pt;flex-shrink:0}'+
+  'h3{font-size:10pt;margin:12px 0 6px;color:#0B5F82;text-transform:uppercase;letter-spacing:.07em;break-after:avoid}h4{margin:0 0 3px;font-size:10pt}'+
+  'table{width:100%;border-collapse:collapse;font-size:9pt}thead{display:table-header-group}th{background:#0A1628;color:#fff;text-align:left;padding:6px 8px;font-size:7.5pt;letter-spacing:.07em;text-transform:uppercase}td{padding:6px 8px;border-bottom:1px solid #E2E8F0;vertical-align:top}tbody tr:nth-child(even) td{background:#F6F9FC}tr{break-inside:avoid}'+
+  '.b{font-weight:700}.mono{font-family:"JetBrains Mono",Consolas,monospace;font-size:8.5pt;word-break:break-all}.bx{font-size:12pt;text-align:center}.sm{font-size:8pt;color:#556;margin-top:2px;white-space:pre-wrap}'+
+  '.urg{color:#C0392B}.legend{font-size:8pt;color:#556;margin:6px 0 0}.lead{margin:0 0 8px;color:#556}.none{color:#889;font-style:italic}'+
+  '.callout{background:#E8F4FA;border:1px solid #BFE0EE;border-radius:8px;padding:7px 12px;margin-bottom:8px;font-weight:600;color:#0B3A5F}'+
+  '.task{border:1px solid #E2E8F0;border-left:3px solid #0B7EA8;border-radius:6px;padding:7px 11px;margin:0 0 7px;break-inside:avoid}.desc{white-space:pre-wrap;tab-size:4;overflow-wrap:anywhere}'+
+  '.ref{font-size:8.5pt;margin-top:3px}.rl{display:inline-block;background:#E4F3FA;color:#0B5F82;border-radius:4px;padding:0 5px;font-size:7pt;font-weight:700;text-transform:uppercase}'+
+  '.box{border:1px solid #DCE6EF;border-radius:8px;padding:9px 13px;margin-top:10px;break-inside:avoid;background:#FAFCFE}.box p,.box ol{margin:4px 0;font-size:9pt}.box ol{padding-left:18px}.kv{display:flex;gap:10px;margin:4px 0}.kv div{flex:1}.kv span{display:block;font-size:7pt;letter-spacing:.08em;text-transform:uppercase;color:#667}'+
+  '.fm-big{font-weight:700;font-size:11pt;color:#0A1628}.fm-hl{padding:0 2px;border-radius:2px}'+
+  '.ft{position:fixed;left:0;bottom:-11mm;font-size:8pt;color:#667}';
+  var toc='<div class="toc"><h5>Contents</h5>'+sec.map(function(x){return '<div><b>'+x.n+'</b>'+x.t+'</div>'}).join('')+'</div>';
+  return '<!doctype html><html><head><meta charset="utf-8"><title>'+ship+' — '+ttl+'</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"><style>'+css+'</style></head><body>'+
+  '<div class="hd"><div class="tag">'+E(h.shipTag||ship)+'</div><h1>'+ttl+'</h1><div class="sub">'+E(h.subtitle||'')+'</div><div class="meta"><span>'+ship+'</span><span>'+E(h.badgeRole||'')+'</span><span>'+E(h.badgeDept||'')+'</span></div></div>'+
+  '<div class="info"><div><span>Last updated</span><b>'+E(upd)+'</b></div><div><span>Printed on</span><b>'+E(now)+'</b></div><div><span>Ship</span><b>'+ship+'</b></div></div>'+toc+
+  sec.map(function(x){return '<h2><span class="no">'+x.n+'</span>'+x.t+'</h2>'+x.b}).join('')+
+  '<div class="ft">'+ship+' · '+ttl+' · Last updated '+E(upd)+'</div></body></html>';
+}
+window.doPrint=function(){
+  closePdfModal();
+  var o={creds:document.getElementById('pdf-creds').checked,pass:document.getElementById('pdf-pass').checked};
+  var html;try{html=build(o)}catch(e){console.error(e);window.print();return}
+  var fr=document.createElement('iframe');fr.setAttribute('aria-hidden','true');fr.style.cssText='position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+  fr.onload=function(){setTimeout(function(){try{fr.contentWindow.focus();fr.contentWindow.print()}catch(e){window.print()}setTimeout(function(){fr.remove()},120000)},800)};
+  document.body.appendChild(fr);fr.srcdoc=html;
+};
+window.__buildReport=build;
 })();
 </script>
 </body>
